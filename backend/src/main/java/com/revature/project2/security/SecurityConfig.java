@@ -45,6 +45,7 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, UserDetailsManager udManager) throws Exception {
         http
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(config -> {
                     // Allow unauthenticated access to the /users endpoint
                     config.requestMatchers(HttpMethod.POST, "/users","/users/register").permitAll();
