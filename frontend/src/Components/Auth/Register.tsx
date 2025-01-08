@@ -1,17 +1,37 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box, Typography, TextField, Button, Divider } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
-import "./Register.css";
+import "./Register.scss";
+
+interface UserData {
+  username: string;
+  password: string;
+  confirmPassword: string;
+}
 
 export const Register: React.FC = () => {
-  const navigate = useNavigate(); // Initialize navigate
+  const [userData, setUserData] = useState({
+    username: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // After successful registration, navigate to the Personalize page
-    navigate("/personalize");
+    // Pass the user data to Personalize component
+    if (userData.password !== userData.confirmPassword) {
+      alert("Passwords do not match!");
+    }else{
+      navigate("/personalize", { state: { userData } });
+    }
   };
-  
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setUserData((prev: UserData) => ({ ...prev, [name]: value }));
+  };
+
   return (
     <Box className="register-container">
       {/* Left Side: Text */}
@@ -37,13 +57,16 @@ export const Register: React.FC = () => {
           Register
         </Typography>
         <Divider />
-        <form>
+        <form onSubmit={handleSubmit}>
           <TextField
             className="textfield"
             fullWidth
             label="Username"
             variant="outlined"
             margin="normal"
+            name="username"
+            value={userData.username}
+            onChange={handleChange}
           />
           <TextField
             className="textfield"
@@ -52,6 +75,9 @@ export const Register: React.FC = () => {
             variant="outlined"
             margin="normal"
             type="password"
+            name="password"
+            value={userData.password}
+            onChange={handleChange}
           />
           <TextField
             className="textfield"
@@ -60,6 +86,9 @@ export const Register: React.FC = () => {
             variant="outlined"
             margin="normal"
             type="password"
+            name="confirmPassword"
+            value={userData.confirmPassword}
+            onChange={handleChange}
           />
           <Button
             className="button2"
@@ -67,7 +96,6 @@ export const Register: React.FC = () => {
             fullWidth
             variant="contained"
             sx={{ marginTop: 2 }}
-            onClick={handleSubmit}
           >
             Continue
           </Button>

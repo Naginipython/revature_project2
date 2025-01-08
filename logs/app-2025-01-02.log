@@ -1,0 +1,85 @@
+2025-01-02 14:49:37 INFO  [main] c.r.p.Project2Application [StartupInfoLogger.java:53] - Starting Project2Application using Java 17.0.13 with PID 79210 (/mnt/Storage/Code/Revature/Project2/backend/target/classes started by ben in /mnt/Storage/Code/Revature/Project2)
+2025-01-02 14:49:37 INFO  [main] c.r.p.Project2Application [SpringApplication.java:652] - No active profile set, falling back to 1 default profile: "default"
+2025-01-02 14:49:37 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate [RepositoryConfigurationDelegate.java:143] - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-01-02 14:49:37 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate [RepositoryConfigurationDelegate.java:211] - Finished Spring Data repository scanning in 19 ms. Found 4 JPA repository interfaces.
+2025-01-02 14:49:37 INFO  [main] o.s.b.w.e.t.TomcatWebServer [TomcatWebServer.java:111] - Tomcat initialized with port 8080 (http)
+2025-01-02 14:49:37 INFO  [main] o.a.c.h.Http11NioProtocol [DirectJDKLog.java:173] - Initializing ProtocolHandler ["http-nio-8080"]
+2025-01-02 14:49:37 INFO  [main] o.a.c.c.StandardService [DirectJDKLog.java:173] - Starting service [Tomcat]
+2025-01-02 14:49:37 INFO  [main] o.a.c.c.StandardEngine [DirectJDKLog.java:173] - Starting Servlet engine: [Apache Tomcat/10.1.34]
+2025-01-02 14:49:37 INFO  [main] o.a.c.c.C.[.[.[/] [DirectJDKLog.java:173] - Initializing Spring embedded WebApplicationContext
+2025-01-02 14:49:37 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext [ServletWebServerApplicationContext.java:296] - Root WebApplicationContext: initialization completed in 717 ms
+2025-01-02 14:49:37 WARN  [main] o.s.a.f.CglibAopProxy [CglibAopProxy.java:295] - Unable to proxy interface-implementing method [public final void org.springframework.web.filter.OncePerRequestFilter.doFilter(jakarta.servlet.ServletRequest,jakarta.servlet.ServletResponse,jakarta.servlet.FilterChain) throws jakarta.servlet.ServletException,java.io.IOException] because it is marked as final, consider using interface-based JDK proxies instead.
+2025-01-02 14:49:37 WARN  [main] o.s.a.f.CglibAopProxy [CglibAopProxy.java:295] - Unable to proxy interface-implementing method [public final void org.springframework.web.filter.GenericFilterBean.init(jakarta.servlet.FilterConfig) throws jakarta.servlet.ServletException] because it is marked as final, consider using interface-based JDK proxies instead.
+2025-01-02 14:49:38 WARN  [main] o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration [JpaBaseConfiguration.java:241] - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-01-02 14:49:38 INFO  [main] o.h.j.i.u.LogHelper [LogHelper.java:31] - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-01-02 14:49:38 INFO  [main] o.h.Version [Version.java:44] - HHH000412: Hibernate ORM core version 6.6.4.Final
+2025-01-02 14:49:38 INFO  [main] o.h.c.i.RegionFactoryInitiator [RegionFactoryInitiator.java:50] - HHH000026: Second-level cache disabled
+2025-01-02 14:49:38 INFO  [main] o.s.o.j.p.SpringPersistenceUnitInfo [SpringPersistenceUnitInfo.java:87] - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-01-02 14:49:38 INFO  [main] c.z.h.HikariDataSource [HikariDataSource.java:109] - HikariPool-1 - Starting...
+2025-01-02 14:49:38 INFO  [main] c.z.h.p.HikariPool [HikariPool.java:554] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@1a3b1f7e
+2025-01-02 14:49:38 INFO  [main] c.z.h.HikariDataSource [HikariDataSource.java:122] - HikariPool-1 - Start completed.
+2025-01-02 14:49:38 INFO  [main] o.h.o.c.pooling [JdbcEnvironmentInitiator.java:157] - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 16.3
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-01-02 14:49:39 INFO  [main] o.h.e.t.j.p.i.JtaPlatformInitiator [JtaPlatformInitiator.java:59] - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-01-02 14:49:40 INFO  [main] o.s.o.j.LocalContainerEntityManagerFactoryBean [AbstractEntityManagerFactoryBean.java:447] - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-01-02 14:49:40 INFO  [main] o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer [InitializeAuthenticationProviderBeanManagerConfigurer.java:80] - Global AuthenticationManager configured with AuthenticationProvider bean with name JWTAuthProvider
+2025-01-02 14:49:40 WARN  [main] o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer [InitializeUserDetailsBeanManagerConfigurer.java:73] - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-01-02 14:49:40 INFO  [main] o.a.c.h.Http11NioProtocol [DirectJDKLog.java:173] - Starting ProtocolHandler ["http-nio-8080"]
+2025-01-02 14:49:40 INFO  [main] o.s.b.w.e.t.TomcatWebServer [TomcatWebServer.java:243] - Tomcat started on port 8080 (http) with context path '/'
+2025-01-02 14:49:40 INFO  [main] c.r.p.Project2Application [StartupInfoLogger.java:59] - Started Project2Application in 3.53 seconds (process running for 3.735)
+2025-01-02 14:49:51 INFO  [SpringApplicationShutdownHook] o.s.b.w.e.t.GracefulShutdown [GracefulShutdown.java:54] - Commencing graceful shutdown. Waiting for active requests to complete
+2025-01-02 14:49:51 INFO  [tomcat-shutdown] o.s.b.w.e.t.GracefulShutdown [GracefulShutdown.java:76] - Graceful shutdown complete
+2025-01-02 14:49:51 INFO  [SpringApplicationShutdownHook] o.s.o.j.LocalContainerEntityManagerFactoryBean [AbstractEntityManagerFactoryBean.java:660] - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-01-02 14:49:51 INFO  [SpringApplicationShutdownHook] c.z.h.HikariDataSource [HikariDataSource.java:349] - HikariPool-1 - Shutdown initiated...
+2025-01-02 14:49:51 INFO  [SpringApplicationShutdownHook] c.z.h.HikariDataSource [HikariDataSource.java:351] - HikariPool-1 - Shutdown completed.
+2025-01-02 15:02:57 INFO  [main] c.r.p.Project2Application [StartupInfoLogger.java:53] - Starting Project2Application using Java 17.0.13 with PID 85425 (/mnt/Storage/Code/Revature/Project2/backend/target/classes started by ben in /mnt/Storage/Code/Revature/Project2)
+2025-01-02 15:02:57 INFO  [main] c.r.p.Project2Application [SpringApplication.java:652] - No active profile set, falling back to 1 default profile: "default"
+2025-01-02 15:02:57 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate [RepositoryConfigurationDelegate.java:143] - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-01-02 15:02:57 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate [RepositoryConfigurationDelegate.java:211] - Finished Spring Data repository scanning in 20 ms. Found 4 JPA repository interfaces.
+2025-01-02 15:02:58 INFO  [main] o.s.b.w.e.t.TomcatWebServer [TomcatWebServer.java:111] - Tomcat initialized with port 8080 (http)
+2025-01-02 15:02:58 INFO  [main] o.a.c.h.Http11NioProtocol [DirectJDKLog.java:173] - Initializing ProtocolHandler ["http-nio-8080"]
+2025-01-02 15:02:58 INFO  [main] o.a.c.c.StandardService [DirectJDKLog.java:173] - Starting service [Tomcat]
+2025-01-02 15:02:58 INFO  [main] o.a.c.c.StandardEngine [DirectJDKLog.java:173] - Starting Servlet engine: [Apache Tomcat/10.1.34]
+2025-01-02 15:02:58 INFO  [main] o.a.c.c.C.[.[.[/] [DirectJDKLog.java:173] - Initializing Spring embedded WebApplicationContext
+2025-01-02 15:02:58 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext [ServletWebServerApplicationContext.java:296] - Root WebApplicationContext: initialization completed in 706 ms
+2025-01-02 15:02:58 WARN  [main] o.s.a.f.CglibAopProxy [CglibAopProxy.java:295] - Unable to proxy interface-implementing method [public final void org.springframework.web.filter.OncePerRequestFilter.doFilter(jakarta.servlet.ServletRequest,jakarta.servlet.ServletResponse,jakarta.servlet.FilterChain) throws jakarta.servlet.ServletException,java.io.IOException] because it is marked as final, consider using interface-based JDK proxies instead.
+2025-01-02 15:02:58 WARN  [main] o.s.a.f.CglibAopProxy [CglibAopProxy.java:295] - Unable to proxy interface-implementing method [public final void org.springframework.web.filter.GenericFilterBean.init(jakarta.servlet.FilterConfig) throws jakarta.servlet.ServletException] because it is marked as final, consider using interface-based JDK proxies instead.
+2025-01-02 15:02:58 WARN  [main] o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration [JpaBaseConfiguration.java:241] - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-01-02 15:02:58 INFO  [main] o.h.j.i.u.LogHelper [LogHelper.java:31] - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-01-02 15:02:58 INFO  [main] o.h.Version [Version.java:44] - HHH000412: Hibernate ORM core version 6.6.4.Final
+2025-01-02 15:02:58 INFO  [main] o.h.c.i.RegionFactoryInitiator [RegionFactoryInitiator.java:50] - HHH000026: Second-level cache disabled
+2025-01-02 15:02:58 INFO  [main] o.s.o.j.p.SpringPersistenceUnitInfo [SpringPersistenceUnitInfo.java:87] - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-01-02 15:02:58 INFO  [main] c.z.h.HikariDataSource [HikariDataSource.java:109] - HikariPool-1 - Starting...
+2025-01-02 15:02:59 INFO  [main] c.z.h.p.HikariPool [HikariPool.java:554] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@1a3b1f7e
+2025-01-02 15:02:59 INFO  [main] c.z.h.HikariDataSource [HikariDataSource.java:122] - HikariPool-1 - Start completed.
+2025-01-02 15:02:59 INFO  [main] o.h.o.c.pooling [JdbcEnvironmentInitiator.java:157] - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 16.3
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-01-02 15:02:59 INFO  [main] o.h.e.t.j.p.i.JtaPlatformInitiator [JtaPlatformInitiator.java:59] - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-01-02 15:03:00 INFO  [main] o.s.o.j.LocalContainerEntityManagerFactoryBean [AbstractEntityManagerFactoryBean.java:447] - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-01-02 15:03:00 INFO  [main] o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer [InitializeAuthenticationProviderBeanManagerConfigurer.java:80] - Global AuthenticationManager configured with AuthenticationProvider bean with name JWTAuthProvider
+2025-01-02 15:03:00 WARN  [main] o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer [InitializeUserDetailsBeanManagerConfigurer.java:73] - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-01-02 15:03:01 INFO  [main] o.a.c.h.Http11NioProtocol [DirectJDKLog.java:173] - Starting ProtocolHandler ["http-nio-8080"]
+2025-01-02 15:03:01 INFO  [main] o.s.b.w.e.t.TomcatWebServer [TomcatWebServer.java:243] - Tomcat started on port 8080 (http) with context path '/'
+2025-01-02 15:03:01 INFO  [main] c.r.p.Project2Application [StartupInfoLogger.java:59] - Started Project2Application in 3.538 seconds (process running for 3.747)
+2025-01-02 15:17:40 INFO  [http-nio-8080-exec-1] o.a.c.c.C.[.[.[/] [DirectJDKLog.java:173] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-01-02 15:17:40 INFO  [http-nio-8080-exec-1] o.s.w.s.DispatcherServlet [FrameworkServlet.java:532] - Initializing Servlet 'dispatcherServlet'
+2025-01-02 15:17:40 INFO  [http-nio-8080-exec-1] o.s.w.s.DispatcherServlet [FrameworkServlet.java:554] - Completed initialization in 0 ms
+2025-01-02 15:19:19 INFO  [http-nio-8080-exec-2] c.r.p.s.EnvelopeService [EnvelopeService.java:78] - Retrieving all envelopes, Envelope count: 0
+2025-01-02 15:19:29 INFO  [http-nio-8080-exec-4] c.r.p.s.EnvelopeService [EnvelopeService.java:78] - Retrieving all envelopes, Envelope count: 0
+2025-01-02 15:25:29 INFO  [SpringApplicationShutdownHook] o.s.b.w.e.t.GracefulShutdown [GracefulShutdown.java:54] - Commencing graceful shutdown. Waiting for active requests to complete
+2025-01-02 15:25:29 INFO  [tomcat-shutdown] o.s.b.w.e.t.GracefulShutdown [GracefulShutdown.java:76] - Graceful shutdown complete
+2025-01-02 15:25:29 INFO  [SpringApplicationShutdownHook] o.s.o.j.LocalContainerEntityManagerFactoryBean [AbstractEntityManagerFactoryBean.java:660] - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-01-02 15:25:29 INFO  [SpringApplicationShutdownHook] c.z.h.HikariDataSource [HikariDataSource.java:349] - HikariPool-1 - Shutdown initiated...
+2025-01-02 15:25:29 INFO  [SpringApplicationShutdownHook] c.z.h.HikariDataSource [HikariDataSource.java:351] - HikariPool-1 - Shutdown completed.

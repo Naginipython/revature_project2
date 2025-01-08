@@ -1,9 +1,32 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box, Typography, TextField, Button, Divider } from "@mui/material";
-import { Link } from "react-router-dom";
-import "./Login.css";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import "./Login.scss";
 
 export const Login: React.FC = () => {
+  const [username, setUsername] = useState(""); // Changed to username
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/users", // Adjust to your backend login endpoint
+        { username, password }, 
+        { withCredentials: true } // Important for cookies/JWT
+      );
+
+      console.log("Login successful:", response.data);
+      alert("Login successful!");
+      navigate("/envelopes"); // Navigate to envelopes
+    } catch (err) {
+      console.error("Login failed:", err);
+    }
+  };
+
   return (
     <Box className="login-container">
       {/* Left Side: Text */}
@@ -22,7 +45,9 @@ export const Login: React.FC = () => {
           </span>
           and <span className="highlight-text">real-time updates, </span> they
           help you make smarter choices and{" "}
-          <span className="highlight-text">take control of your finances effortlessly!</span>
+          <span className="highlight-text">
+            take control of your finances effortlessly!
+          </span>
         </Typography>
       </Box>
 
@@ -32,13 +57,15 @@ export const Login: React.FC = () => {
           Login
         </Typography>
         <Divider />
-        <form>
+        <form onSubmit={handleLogin}>
           <TextField
             className="textfield"
             fullWidth
-            label="Email"
+            label="Username" // Updated label to Username
             variant="outlined"
             margin="normal"
+            value={username} // Changed to username
+            onChange={(e) => setUsername(e.target.value)} // Handle username input
           />
           <TextField
             className="textfield"
@@ -47,6 +74,8 @@ export const Login: React.FC = () => {
             variant="outlined"
             margin="normal"
             type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
           <Button
             className="button1"
@@ -61,7 +90,7 @@ export const Login: React.FC = () => {
         {/* Link to Register */}
         <Box mt={2}>
           <Typography variant="h6" align="center">
-            New Here?
+            New Here?{" "}
             <Link to="/register" className="signup-link">
               Sign up Now!
             </Link>
