@@ -3,13 +3,21 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import { Envelope } from './AddMoneyInterfaces';
+import { useEffect, useState } from 'react';
 
 interface IProps {
 	colorClass: string,
 	envelope: Envelope,
+	onAmountChange: (amount: string) => void,
 }
 
-export const EnvelopeListCard: React.FC<IProps> = ({ colorClass, envelope }: IProps) => {
+export const EnvelopeListCard: React.FC<IProps> = ({ colorClass, envelope, onAmountChange }: IProps) => {
+	const [amount, setAmount] = useState(envelope.amount);
+
+	useEffect(() => {
+        onAmountChange(amount);
+	}, [amount]);
+
 	return (
 		<Card sx={{ minWidth: 275, minHeight: 275, boxShadow: 1, borderRadius: 2 }} variant="outlined">
 			<div className={colorClass}></div>
@@ -26,8 +34,8 @@ export const EnvelopeListCard: React.FC<IProps> = ({ colorClass, envelope }: IPr
 					label="Amount to add"
 					fullWidth
 					margin="normal"
-					value={envelope.amount}
-					onChange={(e) => envelope.setAmount(e.target.value)}
+					value={amount}
+					onChange={(e) => setAmount(e.target.value)}
 					sx={{ width: "75%" }}
 				/>
 			</Box>

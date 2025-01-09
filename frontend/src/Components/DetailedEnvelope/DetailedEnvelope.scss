@@ -1,0 +1,16 @@
+:root {
+    --green: #46C377;
+    --dark-green: #23A455;
+    --light-green: #23a45486;
+    --purple: #8b4dfe;
+    --white: #ffffff;
+    --gray: #d9d9d9;
+}
+
+#newButton{
+    background-color: var(--purple);
+}
+
+.editButton{
+    background-color: var(--purple);
+}

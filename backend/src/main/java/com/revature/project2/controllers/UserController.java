@@ -1,5 +1,6 @@
 package com.revature.project2.controllers;
 
+import com.revature.project2.models.DTOs.OutgoingUserWithTokenDTO;
 import com.revature.project2.models.DTOs.TokenDto;
 import com.revature.project2.services.AuthenticationService;
 import com.revature.project2.services.UserManagementService;
@@ -25,8 +26,20 @@ public class UserController {
     private final UserServices userServices;
 
     @PostMapping
-    public ResponseEntity<TokenDto> login(@RequestBody IncomingLogin user) {
-        return ResponseEntity.ok(authService.login(user.username(), user.password()));
+    public ResponseEntity<OutgoingUserWithTokenDTO> login(@RequestBody IncomingLogin user) {
+        TokenDto token = authService.login(user.username(), user.password());
+        // This is a little jank but whatever
+        User userInfo = userServices.getUserByUsername(user.username());
+        OutgoingUserWithTokenDTO outUser = new OutgoingUserWithTokenDTO(
+                userInfo.getUserId(),
+                userInfo.getUsername(),
+                userInfo.getEmail(),
+                userInfo.getFirstName(),
+                userInfo.getLastName(),
+                userInfo.getRole(),
+                token.token()
+        );
+        return ResponseEntity.ok(outUser);
     }
 
     @PostMapping("/register")
@@ -44,6 +57,12 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<OutgoingUserDTO>> getAllUsers() {
         return ResponseEntity.ok(userServices.getAllUsers());
+    }
+
+    @GetMapping("/{username}")
+    public ResponseEntity<OutgoingUserDTO> getUser(@PathVariable String username){
+        User user = userServices.getUserByUsername(username);
+        return  ResponseEntity.ok(new OutgoingUserDTO(user.getUserId(), user.getUsername(), user.getEmail(), user.getFirstName(), user.getLastName(), user.getRole() ));
     }
 
     @DeleteMapping

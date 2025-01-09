@@ -4,10 +4,15 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Login.scss";
 
+import useStore from "../../stores";
+
 export const Login: React.FC = () => {
   const [username, setUsername] = useState(""); // Changed to username
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+
+	const user = useStore((state) => state.user);
+	const setUser = useStore((state) => state.setUser);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,11 +22,28 @@ export const Login: React.FC = () => {
         "http://localhost:8080/users", // Adjust to your backend login endpoint
         { username, password }, 
         { withCredentials: true } // Important for cookies/JWT
-      );
+      ).then((res) => {
+        console.log("Login successful:", res.data);
+        // Set user information in the store
+        // Change this to actual information later
+        setUser({
+          loggedIn: true,
+    
+          userId: res.data.userId,
+          username: res.data.username,
+          role: res.data.role,
+          firstName: res.data.firstName,
+          lastName: res.data.lastName,
+          token: res.data.token
+        });
+        
+        // Set token in localstorage for later logins
+				localStorage.setItem("gooderBudgetToken", res.data.token);
 
-      console.log("Login successful:", response.data);
-      alert("Login successful!");
-      navigate("/envelopes"); // Navigate to envelopes
+        alert("Login successful!");
+        navigate("/envelopes"); // Navigate to envelopes
+      });
+
     } catch (err) {
       console.error("Login failed:", err);
     }

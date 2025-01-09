@@ -1,55 +1,91 @@
-import { Box, Button, TextField, Typography } from "@mui/material";
-import "./AddMoney.css";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Box, Button, TextField, Typography } from "@mui/material";
 import { EnvelopeListCard } from "./EnvelopeListCard";
 import { Envelope } from './AddMoneyInterfaces';
+import useStore from "../../stores";
+import { UserInfo } from "../../stores";
+import "./AddMoney.css";
 
 export const AddMoney: React.FC = () => {
-    const [from, setFrom] = useState("");
-    const [amount, setAmount] = useState("");
+    const [envs, setEnvs] = useState<Envelope[]>([]);
+
+    const [title, setTitle] = useState("");
     const [desc, setDesc] = useState("");
+    const [amount, setAmount] = useState("");
+
     const [enableBtn, setEnableBtn] = useState(true);
     const [error, setError] = useState("");
-    
-    let envs: Envelope[] = [];
+
+    const user: UserInfo = useStore((state: any) => state.user);
+
+    const navigate = useNavigate();
 
     const handleForm = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(from);
-        console.log(desc);
-        console.log(amount);
         if (
-            envs.reduce((acc, env) => acc + parseInt(env.amount), 0) == parseInt(amount) && 
+            envs.reduce((acc, env) => acc + parseInt(env.amount), 0) == parseInt(amount) &&
             parseInt(amount) > 0
         ) {
-            // TODO: send data to backend
-            // const response = await axios.post("http://localhost:8080/users", {
-            //     username: "benm",
-            //     password: "password"
-            // }, {
-            //     headers: {
-            //         "Content-Type": "application/json"
-            //     }
-            // });
-            // console.log(response.data);
+            const fetchPromises = envs.map((env) => {
+                if (parseInt(env.amount) > 0) {
+                    return fetch(`http://localhost:8080/envelopes/allocate/${env.envelope_id}`, {
+                        method: "POST",
+                        credentials: "include",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + user.token
+                        },
+                        body: JSON.stringify({
+                            title: title,
+                            transactionDescription: desc,
+                            transactionAmount: parseInt(env.amount),
+                            category: ""
+                        }),
+                    });
+                }
+                return Promise.resolve();
+            });
+
+            await Promise.all(fetchPromises);
+            navigate("/envelopes");
         }
     };
+    const handleAmountChange = (index: number, newAmount: string) => {
+        let temp = [...envs];
+        temp[index].amount = newAmount;
+        setEnvs(temp);
+    };
 
-    // TODO: fetch envelopes
-    for (let i = 0; i < 5; i++) {
-        const [amount2, setAmount2] = useState("0");
-        envs.push({
-            envelope_id: i,
-            user_id: 1,
-            envelope_description: "temp",
-            balance: 50,
-            max_limit: 50,
-            envelope_history: [],
-            amount: amount2,
-            setAmount: setAmount2
+    // Fetches all envelopes
+    useEffect(() => {
+        fetch("http://localhost:8080/envelopes", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + user.token
+            },
+            credentials: "include"
+        }).then((response) => {
+            return response.json();
+        }).then((data) => {
+            let temp = [];
+            for (let i = 0; i < data.length; i++) {
+                temp.push({
+                    envelope_id: data[i].envelopeId,
+                    user_id: user.userId,
+                    envelope_description: data[i].envelopeDescription,
+                    balance: data[i].balance,
+                    max_limit: data[i].maxLimit,
+                    amount: "0",
+                    setAmount: null
+                });
+            }
+            setEnvs(temp);
         });
-    }
+    }, []);
 
+    // Error checks amount usage as envelopes fill
     useEffect(() => {
         const sum = envs.reduce((acc, env) => acc + parseInt(env.amount), 0);
         if (amount == "" && sum != 0) {
@@ -78,7 +114,7 @@ export const AddMoney: React.FC = () => {
                         label="Recieved From?"
                         fullWidth
                         margin="normal"
-                        onChange={(e) => setFrom(e.target.value)}
+                        onChange={(e) => setTitle(e.target.value)}
                         required
                     />
                     <TextField
@@ -96,6 +132,7 @@ export const AddMoney: React.FC = () => {
                         onChange={(e) => setDesc(e.target.value)}
                         multiline
                         rows={4}
+                        required
                     />
                     <Button type="submit" variant="contained" color="primary" disabled={enableBtn}>
                         Add Money
@@ -119,7 +156,11 @@ export const AddMoney: React.FC = () => {
 
                         return (
                             <div style={{ height: "fit-content" }} key={index}>
-                                <EnvelopeListCard colorClass={color} envelope={env} />
+                                <EnvelopeListCard 
+                                    colorClass={color} 
+                                    envelope={env} 
+                                    onAmountChange={(newAmount) => handleAmountChange(index, newAmount)}
+                                />
                             </div>
                         );
                     })}

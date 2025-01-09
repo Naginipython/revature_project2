@@ -3,10 +3,29 @@ import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import useStore from "../../stores"; 
 import "./Navbar.css";
 
 export const Navbar: React.FC = () => {
+  const { user, setUser } = useStore(); // Access global user state and updater function
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // Clear user info on logout
+    setUser({
+      loggedIn: false,
+      userId: -1,
+      username: "",
+      role: "",
+      firstName: "",
+      lastName: "",
+      token: "",
+    });
+    alert("You have been logged out!");
+    navigate("/"); // Redirect to the login page
+  };
+
   return (
     <AppBar position="static" id="appbar">
       <Toolbar>
@@ -14,22 +33,34 @@ export const Navbar: React.FC = () => {
           Project Name
         </Typography>
         <div className="button-container">
-          <Button
-            className="oval-button"
-            color="inherit"
-            component={Link}
-            to="/"
-          >
-            Login
-          </Button>
-          <Button
-            className="oval-button"
-            color="inherit"
-            component={Link}
-            to="/register"
-          >
-            Register
-          </Button>
+          {user.loggedIn ? (
+            <Button
+              className="oval-button"
+              color="inherit"
+              onClick={handleLogout}
+            >
+              Logout
+            </Button>
+          ) : (
+            <>
+              <Button
+                className="oval-button"
+                color="inherit"
+                component={Link}
+                to="/"
+              >
+                Login
+              </Button>
+              <Button
+                className="oval-button"
+                color="inherit"
+                component={Link}
+                to="/register"
+              >
+                Register
+              </Button>
+            </>
+          )}
         </div>
       </Toolbar>
     </AppBar>

@@ -11,7 +11,6 @@ export interface Envelope {
 	envelope_description: string,
 	balance: number,
 	max_limit: number,
-	envelope_history: History[],
 	amount: string,
-	setAmount: React.Dispatch<React.SetStateAction<string>>
+	setAmount: React.Dispatch<React.SetStateAction<string>> | null
 }
