@@ -9,7 +9,7 @@ import { EnvelopeList } from "./Components/Envelopes/EnvelopeList";
 import { CreateEnvelope } from "./Components/CreateEnvelope/CreateEnvelope";
 import { useEffect } from "react";
 import SeeUsers from "./Components/SeeUsers/SeeUsers";
-import useStore, { UserInfo } from "./stores";
+import useStore from "./stores";
 
 function App() {
   const setUser = useStore((state) => state.setUser);

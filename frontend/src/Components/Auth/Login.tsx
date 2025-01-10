@@ -11,14 +11,14 @@ export const Login: React.FC = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-	const user = useStore((state) => state.user);
+
 	const setUser = useStore((state) => state.setUser);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post(
+      axios.post(
         "http://localhost:8080/users", // Adjust to your backend login endpoint
         { username, password }, 
         { withCredentials: true } // Important for cookies/JWT
