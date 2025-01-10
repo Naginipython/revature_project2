@@ -83,7 +83,7 @@ export const AddMoney: React.FC = () => {
             }
             setEnvs(temp);
         });
-    }, []);
+    }, [user]);
 
     // Error checks amount usage as envelopes fill
     useEffect(() => {

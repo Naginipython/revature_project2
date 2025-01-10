@@ -52,18 +52,11 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.getAllTransactions());
     }
 
-    /**
-     * Endpoint to update the category of a transaction.
-     *
-     * @param id The ID of the transaction to be updated.
-     * @param transactionDTO The new category to set for the transaction.
-     * @return A ResponseEntity containing the updated transactionDto details.
-     */
     @PatchMapping("/transactions/category/{id}")
-    public ResponseEntity<?> updateTransactionCategory(@PathVariable Integer id, @RequestBody TransactionDTO transactionDTO) {
+    public ResponseEntity<?> updateTransactionCategory(@PathVariable Integer id, @RequestBody String newCategory) {
 
         // Call the service layer to update the transaction category and return the updated transaction
-        return ResponseEntity.ok(transactionService.updateTransactionCategory(id, transactionDTO));
+        return ResponseEntity.ok(transactionService.updateTransactionCategory(id, newCategory));
     }
 
     @GetMapping("/transactions/envelope/{envelopeId}")

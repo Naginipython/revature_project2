@@ -1,42 +1,50 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
-// Only fetch necessary fields
+// Define user interface
 export interface UserInfo {
-	loggedIn: boolean,
-
-	userId: number,
-	username: string,
-	role: string,
-	firstName: string,
-	lastName: string,
-	token: string,
+  loggedIn: boolean;
+  userId: number;
+  username: string;
+  role: string;
+  firstName: string;
+  lastName: string;
+  token: string;
 }
 
-interface storeFuncs {
-	setUser: (newUser: UserInfo) => void,
+// Define store functions and state interface
+interface StoreFuncs {
+  setUser: (newUser: UserInfo) => void;
 }
 
-interface storeInterface {
-	user: UserInfo,
+interface StoreInterface {
+  user: UserInfo;
 }
 
-const useStore = create<storeInterface & storeFuncs>()((set) => ({
-	user: {
-		loggedIn: false,
-	
-		userId: -1,
-		username: "",
-		role: "",
-		firstName: "",
-		lastName: "",
-		token: ""
-	},
+// Zustand store with persistence logic
+const useStore = create<StoreInterface & StoreFuncs>()((set) => ({
+  user: {
+    loggedIn: false,
+    userId: -1,
+    username: "",
+    role: "",
+    firstName: "",
+    lastName: "",
+    token: "",
+  },
 
-	// There's probably a better way to do this lmfao
-	setUser: (newUser) => set((state) => ({
-		user: newUser
-	})),
+  setUser: (newUser) => {
+    if (newUser.loggedIn) {
+      // Store user info in localStorage
+      localStorage.setItem("gooderBudgetUser", JSON.stringify(newUser));
+      localStorage.setItem("gooderBudgetToken", newUser.token);
+    } else {
+      // Clear localStorage on logout
+      localStorage.removeItem("gooderBudgetUser");
+      localStorage.removeItem("gooderBudgetToken");
+    }
 
+    set(() => ({ user: newUser }));
+  },
 }));
 
 export default useStore;

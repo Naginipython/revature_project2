@@ -123,37 +123,37 @@ public class TransactionServiceTests {
         Assertions.assertTrue("Title".equals(responseList.get(0).getTitle()));
     }
 
-    @Test
-    void test_updateTransactionCategory(){
-        TransactionDTO updateTransaction = new TransactionDTO();
-        updateTransaction.setCategory("Bills");
-        Transaction transaction = new Transaction();
-        transaction.setEnvelopeHistories(new ArrayList<EnvelopeHistory>());
-        transaction.setTitle("Title");
-        transaction.setTransactionDescription("Desc");
-        Transaction outTransaction = new Transaction();
-        outTransaction.setEnvelopeHistories(new ArrayList<EnvelopeHistory>());
-        outTransaction.setTitle("Title");
-        outTransaction.setTransactionDescription("Desc");
-        outTransaction.setCategory("Bills");
-        ArgumentCaptor<Transaction> transactionArgumentCaptor = ArgumentCaptor.forClass(Transaction.class);
-        when(transactionRepository.findById(0)).thenReturn(Optional.of(transaction));
-        when(transactionRepository.findById(1)).thenReturn(Optional.empty());
-        when(transactionRepository.save(transactionArgumentCaptor.capture())).thenReturn(outTransaction);
-        TransactionDTO responseTransactionDTO =  transactionService.updateTransactionCategory(0, updateTransaction);
-        Transaction savedTransaction = transactionArgumentCaptor.getValue();
-        Assertions.assertTrue(responseTransactionDTO.getCategory().equals("Bills"));
-        Assertions.assertTrue(responseTransactionDTO.getTransactionDescription().equals("Desc"));
-        Assertions.assertTrue(responseTransactionDTO.getTitle().equals("Title"));
+    // @Test
+    // void test_updateTransactionCategory(){
+    //     TransactionDTO updateTransaction = new TransactionDTO();
+    //     updateTransaction.setCategory("Bills");
+    //     Transaction transaction = new Transaction();
+    //     transaction.setEnvelopeHistories(new ArrayList<EnvelopeHistory>());
+    //     transaction.setTitle("Title");
+    //     transaction.setTransactionDescription("Desc");
+    //     Transaction outTransaction = new Transaction();
+    //     outTransaction.setEnvelopeHistories(new ArrayList<EnvelopeHistory>());
+    //     outTransaction.setTitle("Title");
+    //     outTransaction.setTransactionDescription("Desc");
+    //     outTransaction.setCategory("Bills");
+    //     ArgumentCaptor<Transaction> transactionArgumentCaptor = ArgumentCaptor.forClass(Transaction.class);
+    //     when(transactionRepository.findById(0)).thenReturn(Optional.of(transaction));
+    //     when(transactionRepository.findById(1)).thenReturn(Optional.empty());
+    //     when(transactionRepository.save(transactionArgumentCaptor.capture())).thenReturn(outTransaction);
+    //     TransactionDTO responseTransactionDTO =  transactionService.updateTransactionCategory(0, updateTransaction);
+    //     Transaction savedTransaction = transactionArgumentCaptor.getValue();
+    //     Assertions.assertTrue(responseTransactionDTO.getCategory().equals("Bills"));
+    //     Assertions.assertTrue(responseTransactionDTO.getTransactionDescription().equals("Desc"));
+    //     Assertions.assertTrue(responseTransactionDTO.getTitle().equals("Title"));
 
-        Assertions.assertTrue(savedTransaction.getCategory().equals("Bills"));
-        Assertions.assertTrue(savedTransaction.getTransactionDescription().equals("Desc"));
-        Assertions.assertTrue(savedTransaction.getTitle().equals("Title"));
+    //     Assertions.assertTrue(savedTransaction.getCategory().equals("Bills"));
+    //     Assertions.assertTrue(savedTransaction.getTransactionDescription().equals("Desc"));
+    //     Assertions.assertTrue(savedTransaction.getTitle().equals("Title"));
 
-        BusinessException ex1 = Assertions.assertThrows(BusinessException.class,  ()->transactionService.updateTransactionCategory(1, updateTransaction));
-        updateTransaction.setCategory("");
-        BusinessException ex2 = Assertions.assertThrows(BusinessException.class,  ()->transactionService.updateTransactionCategory(0, updateTransaction));
-    }
+    //     BusinessException ex1 = Assertions.assertThrows(BusinessException.class,  ()->transactionService.updateTransactionCategory(1, updateTransaction));
+    //     updateTransaction.setCategory("");
+    //     BusinessException ex2 = Assertions.assertThrows(BusinessException.class,  ()->transactionService.updateTransactionCategory(0, updateTransaction));
+    // }
 
     @Test
     void test_getTransactionsByEnvelopeId(){

@@ -4,7 +4,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { Link, useNavigate } from "react-router-dom";
-import useStore from "../../stores"; 
+import useStore from "../../stores";
 import "./Navbar.css";
 
 export const Navbar: React.FC = () => {
@@ -12,7 +12,6 @@ export const Navbar: React.FC = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // Clear user info on logout
     setUser({
       loggedIn: false,
       userId: -1,
@@ -22,8 +21,7 @@ export const Navbar: React.FC = () => {
       lastName: "",
       token: "",
     });
-    alert("You have been logged out!");
-    navigate("/"); // Redirect to the login page
+    navigate("/");
   };
 
   return (

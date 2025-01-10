@@ -121,7 +121,10 @@ public class EnvelopeService {
         fromTransaction.setEnvelope(fromEnvelope.get());
         fromTransaction.setDatetime(LocalDateTime.now());
         fromTransaction.setCategory("Envelope Fund Transfer");
-        fromTransaction.setTransactionAmount(transferFundDTO.amount());
+
+        // Make the transaction amount negative to indicate spending on frontend
+        fromTransaction.setTransactionAmount(-transferFundDTO.amount());
+
         fromTransaction.setEnvelope(fromEnvelope.get());
         transactionService.createTransaction(fromTransaction);
 
@@ -172,6 +175,12 @@ public class EnvelopeService {
         transaction.setCategory(transaction.getCategory());
         Transaction savedTransaction = transactionService.createTransaction(transaction);
 
+        EnvelopeHistory currentEnvelopeHistory = new EnvelopeHistory();
+        currentEnvelopeHistory.setEnvelope(envelope.get());
+        currentEnvelopeHistory.setEnvelopeAmount(envelope.get().getBalance());
+        currentEnvelopeHistory.setTransaction(savedTransaction);
+        envelopeHistoryService.createEnvelopeHistory(currentEnvelopeHistory);
+
         return ResponseEntity.ok(savedTransaction);
     }
 
@@ -195,7 +204,15 @@ public class EnvelopeService {
         transaction.setEnvelope(envelope.get());
         transaction.setDatetime(LocalDateTime.now());
         transaction.setCategory(transaction.getCategory());
+        // Make the transaction amount negative to indicate spending on frontend
+        transaction.setTransactionAmount(-transaction.getTransactionAmount());
         Transaction savedTransaction = transactionService.createTransaction(transaction);
+
+        EnvelopeHistory currentEnvelopeHistory = new EnvelopeHistory();
+        currentEnvelopeHistory.setEnvelope(envelope.get());
+        currentEnvelopeHistory.setEnvelopeAmount(envelope.get().getBalance());
+        currentEnvelopeHistory.setTransaction(savedTransaction);
+        envelopeHistoryService.createEnvelopeHistory(currentEnvelopeHistory);
 
         return ResponseEntity.ok(savedTransaction);
     }

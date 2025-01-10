@@ -62,32 +62,15 @@ public class TransactionService {
         return transactionRepository.findAll();
     }
 
-
-    /**
-     * Updates the category of a transaction based on its ID.
-     *
-     * @param id          The ID of the transaction to be updated.
-     * @param transactionDTO The new category to set for the transaction.
-     * @return The updated transactionDTO object after saving it to the repository.
-     * @throws BusinessException If the transaction with the given ID is not found.
-     */
-    public TransactionDTO updateTransactionCategory(Integer id, TransactionDTO transactionDTO) {
-
-        // Log the update operation for tracking
+    public Transaction updateTransactionCategory(Integer id, String newCategory) {
         logger.info("Updating transaction Category for transaction with id: " + id);
-
-        // Find the transaction by ID, throw an exception if not found
         Transaction transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(654, "Transaction not found"));
-
-        // Update the category of the transaction
-        if (transactionDTO.getCategory() == null || transactionDTO.getCategory().isEmpty()) {
+        if (newCategory == null || newCategory.isEmpty()) {
             throw new BusinessException(607,"Transaction category cannot be null or empty");
         }
-        transaction.setCategory(transactionDTO.getCategory());
-
-        // Save the updated transaction and return DTO to the controller
-        return transactionDTOMapper.entityToDTO(transactionRepository.save(transaction)) ;
+        transaction.setCategory(newCategory);
+        return transactionRepository.save(transaction);
     }
 
     public ResponseEntity<?> getTransactionsByEnvelopeId(Integer envelopeId) {

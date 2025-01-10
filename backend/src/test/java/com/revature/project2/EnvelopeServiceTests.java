@@ -217,7 +217,7 @@ public class EnvelopeServiceTests {
         }
         Transaction transTo = transactionList.get(0);
         Transaction transFrom = transactionList.get(1);
-        Assertions.assertEquals(100.0, transTo.getTransactionAmount());
+        Assertions.assertEquals(-100.0, transTo.getTransactionAmount());
         Assertions.assertTrue("TransactionTitle".equals(transTo.getTitle()));
         Assertions.assertTrue("TransactionDesc".equals(transTo.getTransactionDescription()));
         Assertions.assertEquals(100.0, transFrom.getTransactionAmount());
@@ -446,7 +446,7 @@ public class EnvelopeServiceTests {
         Transaction returnTransaction = (Transaction) r.getBody();
         Assertions.assertEquals(100, saveEnvelope.getEnvelopeId());
         Assertions.assertEquals(0.0, saveEnvelope.getBalance());
-        Assertions.assertEquals(100.0, createTransaction.getTransactionAmount());
+        Assertions.assertEquals(-100.0, createTransaction.getTransactionAmount());
         Assertions.assertTrue("saveTransaction".equals(returnTransaction.getTitle()));
     }
 
