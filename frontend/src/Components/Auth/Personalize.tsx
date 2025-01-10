@@ -3,6 +3,7 @@ import { Box, Typography, TextField, Button, Divider } from "@mui/material";
 import { Link, useLocation, useNavigate } from "react-router-dom"; // To access passed props
 import "./Personalize.scss";
 import axios from "axios";
+import useStore from "../../stores";
 
 interface UserData {
   username: string;
@@ -21,6 +22,7 @@ export const Personalize: React.FC = () => {
     email: "",
   });
   const navigate = useNavigate();
+  const setSnackbar = useStore((state) => state.setSnackbar);
 
   const registerUser = async (data: UserData) => {
     try {
@@ -31,7 +33,8 @@ export const Personalize: React.FC = () => {
       ); // Replace with your API endpoint
       console.log("User registered successfully:", response.data);
       // Redirect or show success message here
-      alert("Registration successful!");
+      // alert("Registration successful!");
+      setSnackbar(true, "Registration successful!");
       navigate("/"); // Example: navigate to login
     } catch (error) {
       console.error("Error during registration:", error);

@@ -14,10 +14,15 @@ export interface UserInfo {
 // Define store functions and state interface
 interface StoreFuncs {
   setUser: (newUser: UserInfo) => void;
+  setSnackbar: (open: boolean, message: string) => void;
 }
 
 interface StoreInterface {
   user: UserInfo;
+  snackbar: {
+    open: boolean;
+    message: string;
+  }
 }
 
 // Zustand store with persistence logic
@@ -30,6 +35,10 @@ const useStore = create<StoreInterface & StoreFuncs>()((set) => ({
     firstName: "",
     lastName: "",
     token: "",
+  },
+  snackbar: {
+    open: false,
+    message: "",
   },
 
   setUser: (newUser) => {
@@ -45,6 +54,9 @@ const useStore = create<StoreInterface & StoreFuncs>()((set) => ({
 
     set(() => ({ user: newUser }));
   },
+  setSnackbar: (open, message) => {
+    set(() => ({ snackbar: { open, message } }));
+  }
 }));
 
 export default useStore;

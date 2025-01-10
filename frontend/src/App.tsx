@@ -10,27 +10,34 @@ import { CreateEnvelope } from "./Components/CreateEnvelope/CreateEnvelope";
 import { useEffect } from "react";
 import SeeUsers from "./Components/SeeUsers/SeeUsers";
 import useStore from "./stores";
+import { Alert, Snackbar } from "@mui/material";
 
 function App() {
   const setUser = useStore((state) => state.setUser);
+  const snackbar = useStore((state) => state.snackbar);
+  const setSnackbar = useStore((state) => state.setSnackbar);
   // Login on page refresh
-    useEffect(() => {
-      const token = localStorage.getItem("gooderBudgetToken");
+  useEffect(() => {
+    const token = localStorage.getItem("gooderBudgetToken");
 
-      if (token) {
-        // Parse stored user information (if any)
-        const userInfo = JSON.parse(
-          localStorage.getItem("gooderBudgetUser") || "{}"
-        );
+    if (token) {
+      // Parse stored user information (if any)
+      const userInfo = JSON.parse(
+        localStorage.getItem("gooderBudgetUser") || "{}"
+      );
 
-        if (userInfo && userInfo.token) {
-          setUser({
-            loggedIn: true,
-            ...userInfo,
-          });
-        }
+      if (userInfo && userInfo.token) {
+        setUser({
+          loggedIn: true,
+          ...userInfo,
+        });
       }
-    }, [setUser]);
+    }
+  }, [setUser]);
+
+  const handleCloseSnackbar = () => {
+    setSnackbar(false, "");
+  };
 
   return (
     <>
@@ -47,6 +54,16 @@ function App() {
           <Route path="/users" element={<SeeUsers />} />
         </Routes>
       </BrowserRouter>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={1500}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 }

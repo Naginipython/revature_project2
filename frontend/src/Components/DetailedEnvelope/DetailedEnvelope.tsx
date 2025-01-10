@@ -29,13 +29,19 @@ export const DetailedEnvelope:React.FC = () =>{
     const [remaining, setRemaining] = useState(0);
 
     const [transactionMenu, setTransactionMenu] = useState(false);
+    const [filterMenu, setFilterMenu] = useState(false);  
+
     const [openEdit, setOpenEdit] = useState(false);
     const [openCreate, setOpenCreate] = useState(false);
-    const [transactiontoEdit, setTransactiontoEdit] = useState<Transaction>({transactionId: 0, title: "", transactionAmount: 0, datetime: new Date(), transactionDescription: "", category: ""});
+    const [transactiontoEdit, setTransactiontoEdit] = useState<Transaction>({transactionId: 0, title: "", transactionAmount: 0, datetime: new Date(), transactionDescription: "", category: "Spending"});
     const [transactiontoCreate, setTransactiontoCreate] = useState<OutgoingTransaction>({title: "", transactionAmount: 0, transactionDescription: "", category: ""});
     const [createAmountError, setCreateAmountError] = useState(false);
     const [edited, setEdited] = useState(false);
+
+    const [allCategories, setAllCategories] = useState<string[]>([]);
+    const[filteredCategory, setFilteredCategory] = useState<string>("All");
     
+    const [deleteDialog, setDeleteDialog] = useState(false);
 
     const [loading, setLoading] = useState(true);
     const [showAlert, setShowAlert] = useState(false);
@@ -54,6 +60,21 @@ export const DetailedEnvelope:React.FC = () =>{
       setShowAlert(true);
     }
 
+
+    const deleteEnvelope = async() => {
+      if (user.loggedIn) {
+        axios.delete(`http://localhost:8080/envelopes/${id}`,{headers: {Authorization:`Bearer ${user.token}`, "Content-Type": "application/json"}, withCredentials: true})
+        .then((response) => {
+          console.log(response);
+          toastAlert("Envelope deleted successfully!");
+          navigate("/envelopes");
+        })
+        .catch((err) => {
+          toastAlert("Error deleting envelope.");
+          console.error(err);
+        });
+      }
+    }
 
     // Transaction editing functions
     const changeEditTransactionValues = (event:any) =>{
@@ -100,16 +121,20 @@ export const DetailedEnvelope:React.FC = () =>{
 
       if (different) {
         toastAlert("Transaction edited successfully!");
-
+        let newCategories:string[] = [];
         setTransactions(
         transactions.map((transaction) => {
           if (transaction.transactionId === transactiontoEdit.transactionId) {
+            newCategories.push(transactiontoEdit.category);
             return { ...transaction, title: transactiontoEdit.title, transactionDescription: transactiontoEdit.transactionDescription, category: transactiontoEdit.category };
+
           } else {
+            newCategories.push(transaction.category);
             return transaction;
           }
         })
-      );
+        );
+        setAllCategories([...new Set(newCategories)]);
       }
       else{
         toastAlert("No changes made to transaction.");
@@ -134,10 +159,16 @@ export const DetailedEnvelope:React.FC = () =>{
 
 
     const handleCreateClose = () =>{
-      setTransactiontoCreate({title: "", transactionAmount: 0, transactionDescription: "", category: ""});
+      setTransactiontoCreate({title: "", transactionAmount: 0, transactionDescription: "", category: "Spending"});
       setOpenCreate(false);
       setCreateAmountError(false);
 
+    }
+
+    const handleCreateOpen= () =>{
+      setTransactiontoCreate({title: "", transactionAmount: 0, transactionDescription: "", category: "Spending"});
+      setOpenCreate(true);
+      setCreateAmountError(false);
     }
 
     const createTransaction = async(event:any) => {
@@ -152,8 +183,11 @@ export const DetailedEnvelope:React.FC = () =>{
         .then((response) => {
           setTransactions([...transactions, {transactionId: response.data.transactionId, title: response.data.title, transactionAmount: response.data.transactionAmount, datetime: new Date(response.data.datetime), transactionDescription: response.data.transactionDescription, category: response.data.category}]);
           setEnvelope({...envelope, balance: envelope.balance + response.data.transactionAmount});
+          setEnvelopeHistory([...envelopeHistory, {amountHistoryId: 0, envelope: envelope, transaction: response.data, envelopeAmount: envelope.balance+ response.data.transactionAmount}]);
+          setAllCategories([...new Set([...allCategories, response.data.category])]);
           setRemaining(remaining+response.data.transactionAmount);
           toastAlert("Transaction created successfully!");
+          console.log(envelopeHistory);
         }).catch((err) => {
           toastAlert("Error creating transaction.");
           console.error(err);
@@ -161,7 +195,7 @@ export const DetailedEnvelope:React.FC = () =>{
     }
 
 
-    // Fetch envelope info, transactions, and envelope history at component mount
+    // Fetch envelope info, transactions, categories and envelope history at component mount
     useEffect(()=>{
       if(user.loggedIn){
         //fetch envelope info
@@ -222,6 +256,7 @@ export const DetailedEnvelope:React.FC = () =>{
                 fetchedTransactions.push(newTransaction);
               }
               setTransactions(fetchedTransactions);
+              setAllCategories([...new Set(fetchedTransactions.map((transaction) => transaction.category))]);
             }
           })
           .catch((err) => {
@@ -368,8 +403,11 @@ export const DetailedEnvelope:React.FC = () =>{
                       <Grid2 size={12}>
                         <Divider />
                       </Grid2>
+                      {/* Remaining amount is calculated by subtracting the max limit from the balance */}
                       <Grid2 size={6}>
-                        <Typography variant="h5">Remaining</Typography>
+                        <Typography variant="h5">
+                          Remaining for addition
+                        </Typography>
                       </Grid2>
                       <Grid2 size={6}>
                         <Typography variant="h5">
@@ -398,6 +436,10 @@ export const DetailedEnvelope:React.FC = () =>{
                           <Typography variant="h5" sx={{ fontWeight: "bold" }}>
                             Transactions
                           </Typography>
+                          {/* Filter and Options buttons */}
+                          
+                          <Button id="categoryButton" onClick={()=>{setFilterMenu(true)}}>Filter</Button>
+                          {envelope.user !=null ?
                           <Button
                             onClick={() => {
                               setTransactionMenu(true);
@@ -405,8 +447,10 @@ export const DetailedEnvelope:React.FC = () =>{
                             id="newButton"
                             variant="contained"
                           >
-                            New
+                            Options
                           </Button>
+                          : <></>}
+                          {/* Menu for creating transactions */}
                           <Menu
                             open={transactionMenu}
                             onClose={() => {
@@ -427,16 +471,84 @@ export const DetailedEnvelope:React.FC = () =>{
                                 navigate("/add");
                               }}
                             >
-                              Add
+                              Add Money
                             </MenuItem>
                             <MenuItem
                               onClick={() => {
-                                setOpenCreate(true);
+                                handleCreateOpen();
                                 setTransactionMenu(false);
                               }}
                             >
-                              Spend
+                              Spend Money
                             </MenuItem>
+                            <MenuItem sx={{ color: "red" }}
+                              onClick={() => {
+                                setDeleteDialog(true);
+                              }}
+                            >
+                              Delete Envelope
+                            </MenuItem>
+                          </Menu>
+
+                          {/* Dialog for deleting envelope */}
+                          <Dialog open={deleteDialog} onClose={() => {setDeleteDialog(false);}}>
+                            <DialogTitle>Delete Envelope</DialogTitle>
+                            <DialogContent>
+                              <DialogContentText>
+                                Are you sure you want to delete this envelope?
+                              </DialogContentText>
+                            </DialogContent>
+                            <DialogActions>
+                              <Button
+                                onClick={() => {
+                                  deleteEnvelope();
+                                }}
+                              >
+                                Yes
+                              </Button>
+                              <Button
+                                onClick={() => {
+                                  setDeleteDialog(false);
+                                }}
+                              >
+                                No
+                              </Button>
+                            </DialogActions>
+                          </Dialog>
+
+                          {/* Menu for filtering transactions */}
+                           <Menu
+                            open={filterMenu}
+                            onClose={() => {
+                              setFilterMenu(false);
+                            }}
+                            anchorEl={document.getElementById("categoryButton")}
+                            anchorOrigin={{
+                              vertical: "bottom",
+                              horizontal: "left",
+                            }}
+                            transformOrigin={{
+                              vertical: "top",
+                              horizontal: "left",
+                            }}
+                          >
+                            <MenuItem sx={{ fontWeight: "bold" }}
+                              onClick={() => {
+                                setFilteredCategory("All");
+                                setFilterMenu(false);
+                              }}>All</MenuItem>
+                            {allCategories.map((category) => {
+                              return (
+                                <MenuItem 
+                                  onClick={() => {
+                                    setFilteredCategory(category);
+                                    setFilterMenu(false);
+                                  }}
+                                >
+                                  {category}
+                                </MenuItem>
+                              );
+                            })}
                           </Menu>
                         </Stack>
                       </>
@@ -451,6 +563,7 @@ export const DetailedEnvelope:React.FC = () =>{
                       </Typography>
                     ) : (
                       transactions
+                        .filter((transaction) => transaction.category === filteredCategory || filteredCategory === "All")
                         .sort(
                           (a, b) => b.datetime.getTime() - a.datetime.getTime()
                         )
@@ -552,7 +665,8 @@ export const DetailedEnvelope:React.FC = () =>{
                   </CardContent>
                 </Card>
               </Grid2>
-
+              
+              {/* Grid2 element with card inside to display balance history graph */}
               <Grid2 size={{ xs: 12, md: 5 }}>
                 <Card variant="outlined" sx={{ boxShadow: 3 }}>
                   <CardHeader
@@ -622,10 +736,12 @@ export const DetailedEnvelope:React.FC = () =>{
                     label="Amount"
                     type="number"
                     slotProps={{
-                            input: {
-                              startAdornment:<InputAdornment position="start">$</InputAdornment>,
-                            },
-                          }}
+                      input: {
+                        startAdornment: (
+                          <InputAdornment position="start">$</InputAdornment>
+                        ),
+                      },
+                    }}
                     helperText={
                       createAmountError
                         ? "Amount exceeds envelope balance."
@@ -638,6 +754,7 @@ export const DetailedEnvelope:React.FC = () =>{
                     id="createTransactionCategory"
                     name="category"
                     label="Category"
+                    defaultValue={transactiontoCreate.category}
                     multiline
                     maxRows={5}
                     required
@@ -659,18 +776,12 @@ export const DetailedEnvelope:React.FC = () =>{
                     transactiontoCreate.title === "" ||
                     transactiontoCreate.transactionAmount === 0 ||
                     transactiontoCreate.transactionDescription === "" ||
-                    transactiontoCreate.category === ""
+                    transactiontoCreate.category === "" 
                   }
                   type="submit"
                   onClick={(e) => {
                     createTransaction(e);
-                    setTransactiontoCreate({
-                      title: "",
-                      transactionAmount: 0,
-                      transactionDescription: "",
-                      category: "",
-                    });
-                    setOpenCreate(false);
+                    handleCreateClose();
                   }}
                 >
                   Submit

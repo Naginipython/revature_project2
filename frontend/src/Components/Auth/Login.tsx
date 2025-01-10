@@ -11,14 +11,14 @@ export const Login: React.FC = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-
 	const setUser = useStore((state) => state.setUser);
+  const setSnackbar = useStore((state) => state.setSnackbar);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      axios.post(
+      await axios.post(
         "http://localhost:8080/users", // Adjust to your backend login endpoint
         { username, password }, 
         { withCredentials: true } // Important for cookies/JWT
@@ -36,11 +36,14 @@ export const Login: React.FC = () => {
           lastName: res.data.lastName,
           token: res.data.token
         });
+
+        // Show the Snackbar
+        setSnackbar(true, "Login successful!");
         
         // Set token in localstorage for later logins
 				localStorage.setItem("gooderBudgetToken", res.data.token);
 
-        alert("Login successful!");
+        // alert("Login successful!");
         navigate("/envelopes"); // Navigate to envelopes
       });
 

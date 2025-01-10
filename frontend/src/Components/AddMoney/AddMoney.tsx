@@ -40,7 +40,7 @@ export const AddMoney: React.FC = () => {
                             title: title,
                             transactionDescription: desc,
                             transactionAmount: parseInt(env.amount),
-                            category: ""
+                            category: "Addition"
                         }),
                     });
                 }

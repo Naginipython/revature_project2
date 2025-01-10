@@ -3,7 +3,8 @@ import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import { Link, useNavigate } from "react-router-dom";
+import Link from "@mui/material/Link";
+import { useNavigate } from "react-router-dom";
 import useStore from "../../stores";
 import "./Navbar.css";
 
@@ -32,20 +33,49 @@ export const Navbar: React.FC = () => {
         </Typography>
         <div className="button-container">
           {user.loggedIn ? (
-            <Button
-              className="oval-button"
-              color="inherit"
-              onClick={handleLogout}
-            >
-              Logout
-            </Button>
+            <>
+              <Link 
+                variant="h5" 
+                sx={{ color: "white", textDecorationColor: "white", cursor: "pointer" }} 
+                underline="always"
+                onClick={() => navigate("/envelopes")}
+              >
+                Envelopes
+              </Link>
+              <Link 
+                variant="h5" 
+                sx={{ color: "white", textDecorationColor: "white", cursor: "pointer" }} 
+                underline="always"
+
+                onClick={() => navigate("/envelopes")}
+              >
+                Activity
+              </Link>
+              {user.role == "ROLE_MANAGER" &&
+                <Link 
+                  variant="h5" 
+                  sx={{ color: "white", textDecorationColor: "white", cursor: "pointer" }} 
+                  underline="always"
+                  onClick={() => navigate("/users")}
+                >
+                  Users
+                </Link>
+              }
+              <Button
+                className="oval-button"
+                color="inherit"
+                onClick={handleLogout}
+              >
+                Logout
+              </Button>
+            </>
           ) : (
             <>
               <Button
                 className="oval-button"
                 color="inherit"
                 component={Link}
-                to="/"
+                onClick={() => navigate("/")}
               >
                 Login
               </Button>
@@ -53,7 +83,7 @@ export const Navbar: React.FC = () => {
                 className="oval-button"
                 color="inherit"
                 component={Link}
-                to="/register"
+                onClick={() => navigate("/register")}
               >
                 Register
               </Button>
