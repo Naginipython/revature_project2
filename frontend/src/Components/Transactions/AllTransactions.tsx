@@ -170,7 +170,7 @@ export const AllTransactions: React.FC = () => {
   useEffect(() => {
     if (user.loggedIn){
         axios
-        .get(`/transactions`, {
+        .get(`${backendHost}/transactions`, {
             headers: {
             Authorization: `Bearer ${user.token}`,
             "Content-Type": "application/json",
