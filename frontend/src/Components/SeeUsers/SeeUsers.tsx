@@ -2,6 +2,7 @@ import { Box, Typography } from "@mui/material";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Paper } from "@mui/material";
 import { useEffect, useState } from "react";
 import useStore, { UserInfo } from "../../stores";
+import backendHost from "../../backendHost";
 
 interface User {
     userId: number,
@@ -19,7 +20,7 @@ export default function () {
     useEffect(() => {
         // Fetch users from the server
         console.log(u);
-        fetch("http://localhost:8080/users", {
+        fetch(backendHost + "/users", {
             method: "GET",
             credentials: "include",
             headers: {
@@ -38,7 +39,7 @@ export default function () {
 
     const handleDeleteUser = (username: string) => {
         // Delete user
-        fetch(`http://localhost:8080/users/${username}`, {
+        fetch(`${backendHost}/users/${username}`, {
             method: "DELETE",
             credentials: "include",
             headers: {

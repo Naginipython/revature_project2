@@ -5,6 +5,7 @@ import axios from "axios";
 import "./Login.scss";
 
 import useStore from "../../stores";
+import backendHost from "../../backendHost";
 
 export const Login: React.FC = () => {
   const [username, setUsername] = useState(""); // Changed to username
@@ -19,7 +20,7 @@ export const Login: React.FC = () => {
 
     try {
       await axios.post(
-        "http://localhost:8080/users", // Adjust to your backend login endpoint
+        backendHost + "/users", // Adjust to your backend login endpoint
         { username, password }, 
         { withCredentials: true } // Important for cookies/JWT
       ).then((res) => {

@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom"; // To access 
 import "./Personalize.scss";
 import axios from "axios";
 import useStore from "../../stores";
+import backendHost from "../../backendHost";
 
 interface UserData {
   username: string;
@@ -27,7 +28,7 @@ export const Personalize: React.FC = () => {
   const registerUser = async (data: UserData) => {
     try {
       const response = await axios.post(
-        "http://localhost:8080/users/register",
+        backendHost + "/users/register",
         data,
         { withCredentials: true },
       ); // Replace with your API endpoint
