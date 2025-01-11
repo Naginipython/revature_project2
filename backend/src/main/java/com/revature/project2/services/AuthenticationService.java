@@ -46,8 +46,9 @@ public class AuthenticationService {
     }
 
     // putting this code here as it should be a function of authentification
-    //
-    private boolean validateCurrentUserRole(String authorizedLevelRole){
+    // WARNING: works differnetly from source code.
+    // pass in the role you want to validate the current user against
+    public boolean validateCurrentUserRole(String authorizedLevelRole){
         // if no user in the context, just check for provided roles
         var currentUser = getAuthenticatedUser();
         if(currentUser.isEmpty()){
@@ -56,8 +57,8 @@ public class AuthenticationService {
         List<UserRoles> currentRoles = currentUser.get().getValue();
 
         var authRole = UserRoles.valueOf(authorizedLevelRole.trim());
-        boolean isAuthRoleHigherThanAnyPresent = currentRoles.stream().allMatch(curRole->authRole.ordinal()>curRole.ordinal());
-        if(isAuthRoleHigherThanAnyPresent){return false;}
-        return true;
+        boolean isAuthRoleHigherThanAnyPresent = currentRoles.stream().allMatch(curRole->curRole.ordinal()>=authRole.ordinal());
+        if(isAuthRoleHigherThanAnyPresent){return true;}
+        return false;
     }
 }

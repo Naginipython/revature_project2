@@ -7,6 +7,7 @@ import com.revature.project2.models.EnvelopeHistory;
 import com.revature.project2.models.Transaction;
 import com.revature.project2.models.mappers.TransactionDTOMapper;
 import com.revature.project2.repositories.TransactionRepository;
+import com.revature.project2.services.AuthenticationService;
 import com.revature.project2.services.TransactionService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,11 +31,12 @@ import static org.mockito.Mockito.when;
 public class TransactionServiceTests {
     private TransactionRepository transactionRepository;
     private TransactionService transactionService;
-
+    private AuthenticationService authenticationService;
     @BeforeEach
     void contextLoads(){
         transactionRepository = Mockito.mock(TransactionRepository.class);
-        transactionService = new TransactionService(transactionRepository, new TransactionDTOMapper());
+        authenticationService = Mockito.mock(AuthenticationService.class);
+        transactionService = new TransactionService(transactionRepository, authenticationService, new TransactionDTOMapper());
     }
 
     @Test
@@ -56,7 +59,10 @@ public class TransactionServiceTests {
         Assertions.assertTrue(savedTransaction.getTitle().equals("newTitle"));
         Assertions.assertTrue(savedTransaction.getTransactionAmount()==100);
 
-        RuntimeException ex = Assertions.assertThrows(RuntimeException.class, ()->transactionService.updateTransactionTitle(1, "newTitle"));
+        RuntimeException ex1 = Assertions.assertThrows(RuntimeException.class, ()->transactionService.updateTransactionTitle(1, "newTitle"));
+        transaction.setAudited(true);
+        RuntimeException ex2 = Assertions.assertThrows(RuntimeException.class, ()->transactionService.updateTransactionTitle(0, "newTitle"));
+
     }
 
     @Test
@@ -79,7 +85,65 @@ public class TransactionServiceTests {
         Assertions.assertTrue(savedTransaction.getTransactionDescription().equals("Desc"));
         Assertions.assertTrue(savedTransaction.getTransactionAmount()==100);
 
-        RuntimeException ex = Assertions.assertThrows(RuntimeException.class, ()->transactionService.updateTransactionDescription(1, "newTitle"));
+        RuntimeException ex1 = Assertions.assertThrows(RuntimeException.class, ()->transactionService.updateTransactionDescription(1, "newTitle"));
+        transaction.setAudited(true);
+        RuntimeException ex2 = Assertions.assertThrows(RuntimeException.class, ()->transactionService.updateTransactionDescription(0, "newTitle"));
+
+    }
+
+    @Test
+    void test_updateTransactionAudited_valid(){
+        Transaction transaction = new Transaction();
+        transaction.setTransactionAmount(100);
+        Transaction updateTransaction = new Transaction();
+        updateTransaction.setTransactionAmount(100);
+        updateTransaction.setAudited(true);
+        when(authenticationService.validateCurrentUserRole("ROLE_MANAGER")).thenReturn(true);
+        ArgumentCaptor<Transaction> transactionCapture = ArgumentCaptor.forClass(Transaction.class);
+        when(transactionRepository.findById(0)).thenReturn(Optional.of(transaction));
+        when(transactionRepository.findById(1)).thenReturn(Optional.empty());
+        when(transactionRepository.save(transactionCapture.capture())).thenReturn(updateTransaction);
+        //NOTE: incorrect output, but 1.) we just want to see what this saved 2.) returning getcapture output errors
+        Transaction responseTransaction = transactionService.setTransactionAuditStatus(0, true);
+        Transaction savedTransaction = transactionCapture.getValue();
+        Assertions.assertTrue(responseTransaction.isAudited());
+        Assertions.assertTrue(responseTransaction.getTransactionAmount()==100);
+
+        Assertions.assertTrue(savedTransaction.isAudited());
+        Assertions.assertTrue(savedTransaction.getTransactionAmount()==100);
+    }
+
+    @Test
+    void test_updateTransactionAudited_invalid_userRoleEmployee(){
+        Transaction transaction = new Transaction();
+        transaction.setTransactionAmount(100);
+        Transaction updateTransaction = new Transaction();
+        updateTransaction.setTransactionAmount(100);
+        updateTransaction.setAudited(true);
+        when(authenticationService.validateCurrentUserRole("ROLE_MANAGER")).thenReturn(false);
+        ArgumentCaptor<Transaction> transactionCapture = ArgumentCaptor.forClass(Transaction.class);
+        when(transactionRepository.findById(0)).thenReturn(Optional.of(transaction));
+        when(transactionRepository.findById(1)).thenReturn(Optional.empty());
+        when(transactionRepository.save(transactionCapture.capture())).thenReturn(updateTransaction);
+        //NOTE: incorrect output, but 1.) we just want to see what this saved 2.) returning getcapture output errors
+        RuntimeException ex =  Assertions.assertThrows(RuntimeException.class, ()->transactionService.setTransactionAuditStatus(0, true));
+    }
+
+
+    @Test
+    void test_updateTransactionAudited_invalid_unFound(){
+        Transaction transaction = new Transaction();
+        transaction.setTransactionAmount(100);
+        Transaction updateTransaction = new Transaction();
+        updateTransaction.setTransactionAmount(100);
+        updateTransaction.setAudited(true);
+        when(authenticationService.validateCurrentUserRole("ROLE_MANAGER")).thenReturn(false);
+        ArgumentCaptor<Transaction> transactionCapture = ArgumentCaptor.forClass(Transaction.class);
+        when(transactionRepository.findById(0)).thenReturn(Optional.of(transaction));
+        when(transactionRepository.findById(1)).thenReturn(Optional.empty());
+        when(transactionRepository.save(transactionCapture.capture())).thenReturn(updateTransaction);
+        //NOTE: incorrect output, but 1.) we just want to see what this saved 2.) returning getcapture output errors
+        BusinessException ex =  Assertions.assertThrows(BusinessException.class, ()->transactionService.setTransactionAuditStatus(1, true));
     }
 
     @Test
@@ -123,37 +187,39 @@ public class TransactionServiceTests {
         Assertions.assertTrue("Title".equals(responseList.get(0).getTitle()));
     }
 
-    // @Test
-    // void test_updateTransactionCategory(){
-    //     TransactionDTO updateTransaction = new TransactionDTO();
-    //     updateTransaction.setCategory("Bills");
-    //     Transaction transaction = new Transaction();
-    //     transaction.setEnvelopeHistories(new ArrayList<EnvelopeHistory>());
-    //     transaction.setTitle("Title");
-    //     transaction.setTransactionDescription("Desc");
-    //     Transaction outTransaction = new Transaction();
-    //     outTransaction.setEnvelopeHistories(new ArrayList<EnvelopeHistory>());
-    //     outTransaction.setTitle("Title");
-    //     outTransaction.setTransactionDescription("Desc");
-    //     outTransaction.setCategory("Bills");
-    //     ArgumentCaptor<Transaction> transactionArgumentCaptor = ArgumentCaptor.forClass(Transaction.class);
-    //     when(transactionRepository.findById(0)).thenReturn(Optional.of(transaction));
-    //     when(transactionRepository.findById(1)).thenReturn(Optional.empty());
-    //     when(transactionRepository.save(transactionArgumentCaptor.capture())).thenReturn(outTransaction);
-    //     TransactionDTO responseTransactionDTO =  transactionService.updateTransactionCategory(0, updateTransaction);
-    //     Transaction savedTransaction = transactionArgumentCaptor.getValue();
-    //     Assertions.assertTrue(responseTransactionDTO.getCategory().equals("Bills"));
-    //     Assertions.assertTrue(responseTransactionDTO.getTransactionDescription().equals("Desc"));
-    //     Assertions.assertTrue(responseTransactionDTO.getTitle().equals("Title"));
+     @Test
+     void test_updateTransactionCategory(){
+         TransactionDTO updateTransaction = new TransactionDTO();
+         updateTransaction.setCategory("Bills");
+         Transaction transaction = new Transaction();
+         transaction.setEnvelopeHistories(new ArrayList<EnvelopeHistory>());
+         transaction.setTitle("Title");
+         transaction.setTransactionDescription("Desc");
+         Transaction outTransaction = new Transaction();
+         outTransaction.setEnvelopeHistories(new ArrayList<EnvelopeHistory>());
+         outTransaction.setTitle("Title");
+         outTransaction.setTransactionDescription("Desc");
+         outTransaction.setCategory("Bills");
+         ArgumentCaptor<Transaction> transactionArgumentCaptor = ArgumentCaptor.forClass(Transaction.class);
+         when(transactionRepository.findById(0)).thenReturn(Optional.of(transaction));
+         when(transactionRepository.findById(1)).thenReturn(Optional.empty());
+         when(transactionRepository.save(transactionArgumentCaptor.capture())).thenReturn(outTransaction);
+         Transaction responseTransaction =  transactionService.updateTransactionCategory(0, "Bills");
+         Transaction savedTransaction = transactionArgumentCaptor.getValue();
+         Assertions.assertTrue(responseTransaction.getCategory().equals("Bills"));
+         Assertions.assertTrue(responseTransaction.getTransactionDescription().equals("Desc"));
+         Assertions.assertTrue(responseTransaction.getTitle().equals("Title"));
 
-    //     Assertions.assertTrue(savedTransaction.getCategory().equals("Bills"));
-    //     Assertions.assertTrue(savedTransaction.getTransactionDescription().equals("Desc"));
-    //     Assertions.assertTrue(savedTransaction.getTitle().equals("Title"));
+         Assertions.assertTrue(savedTransaction.getCategory().equals("Bills"));
+         Assertions.assertTrue(savedTransaction.getTransactionDescription().equals("Desc"));
+         Assertions.assertTrue(savedTransaction.getTitle().equals("Title"));
 
-    //     BusinessException ex1 = Assertions.assertThrows(BusinessException.class,  ()->transactionService.updateTransactionCategory(1, updateTransaction));
-    //     updateTransaction.setCategory("");
-    //     BusinessException ex2 = Assertions.assertThrows(BusinessException.class,  ()->transactionService.updateTransactionCategory(0, updateTransaction));
-    // }
+         BusinessException ex1 = Assertions.assertThrows(BusinessException.class,  ()->transactionService.updateTransactionCategory(1, "Bills"));
+         BusinessException ex2 = Assertions.assertThrows(BusinessException.class,  ()->transactionService.updateTransactionCategory(1, ""));
+
+         transaction.setAudited(true);
+         RuntimeException ex3 = Assertions.assertThrows(RuntimeException.class,  ()->transactionService.updateTransactionCategory(0, "Bills"));
+     }
 
     @Test
     void test_getTransactionsByEnvelopeId(){

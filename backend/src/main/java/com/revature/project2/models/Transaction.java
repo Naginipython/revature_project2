@@ -31,6 +31,8 @@ public class Transaction {
     @JsonIgnore
     private List<EnvelopeHistory> envelopeHistories;
 
+    private boolean audited = false;
+
     public Transaction() {
     }
 
@@ -42,6 +44,18 @@ public class Transaction {
         this.datetime = datetime;
         this.category = category;
         this.transactionAmount = transactionAmount;
+    }
+
+    public Transaction(int transactionId, String title, String transactionDescription, Envelope envelope, LocalDateTime datetime, String category, double transactionAmount, List<EnvelopeHistory> envelopeHistories, boolean audited) {
+        this.transactionId = transactionId;
+        this.title = title;
+        this.transactionDescription = transactionDescription;
+        this.envelope = envelope;
+        this.datetime = datetime;
+        this.category = category;
+        this.transactionAmount = transactionAmount;
+        this.envelopeHistories = envelopeHistories;
+        this.audited = audited;
     }
 
     public int getTransactionId() {
@@ -106,6 +120,14 @@ public class Transaction {
 
     public void setEnvelopeHistories(List<EnvelopeHistory> envelopeHistories) {
         this.envelopeHistories = envelopeHistories;
+    }
+
+    public boolean isAudited() {
+        return audited;
+    }
+
+    public void setAudited(boolean audited) {
+        this.audited = audited;
     }
 
     @Override

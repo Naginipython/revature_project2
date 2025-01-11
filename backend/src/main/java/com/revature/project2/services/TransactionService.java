@@ -16,11 +16,12 @@ import java.util.List;
 public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final Logger logger = LoggerFactory.getLogger(TransactionService.class);
-
+    private final AuthenticationService authenticationService;
     private final TransactionDTOMapper transactionDTOMapper;
 
-    public TransactionService(TransactionRepository transactionRepository, TransactionDTOMapper transactionDTOMapper) {
+    public TransactionService(TransactionRepository transactionRepository, AuthenticationService authenticationService, TransactionDTOMapper transactionDTOMapper) {
         this.transactionRepository = transactionRepository;
+        this.authenticationService = authenticationService;
         this.transactionDTOMapper = transactionDTOMapper;
     }
 
@@ -28,6 +29,7 @@ public class TransactionService {
         logger.info("Updating transaction title for transaction with id: " + id);
         Transaction transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Transaction not found"));
+        if (transaction.isAudited()){ throw new RuntimeException("Transaction Audited");}
         transaction.setTitle(newTitle);
         return transactionRepository.save(transaction);
     }
@@ -36,6 +38,7 @@ public class TransactionService {
         logger.info("Updating transaction description for transaction with id: " + id);
         Transaction transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Transaction not found"));
+        if (transaction.isAudited()){ throw new RuntimeException("Transaction Audited");}
         transaction.setTransactionDescription(newDescription);
         return transactionRepository.save(transaction);
     }
@@ -66,14 +69,25 @@ public class TransactionService {
         logger.info("Updating transaction Category for transaction with id: " + id);
         Transaction transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(654, "Transaction not found"));
+        if (transaction.isAudited()){ throw new RuntimeException("Transaction Audited");}
         if (newCategory == null || newCategory.isEmpty()) {
             throw new BusinessException(607,"Transaction category cannot be null or empty");
         }
-
-
         transaction.setCategory(newCategory);
         return transactionRepository.save(transaction);
     }
+
+    public Transaction setTransactionAuditStatus(Integer id, boolean status){
+        logger.info("Updating transaction Category for transaction with id: " + id);
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(654, "Transaction not found"));
+        if (!authenticationService.validateCurrentUserRole("ROLE_MANAGER")){
+            throw new RuntimeException("Transaction audit status must be set by Manager");
+        }
+        transaction.setAudited(status);
+        return transactionRepository.save(transaction);
+    }
+
 
     public ResponseEntity<?> getTransactionsByEnvelopeId(Integer envelopeId) {
         logger.info("Retrieving transaction by envelope id: " + envelopeId);

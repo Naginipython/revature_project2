@@ -64,5 +64,18 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.getTransactionsByEnvelopeId(envelopeId));
     }
 
+    @PatchMapping("/transactions/audit/{id}")
+    public ResponseEntity<?> auditTransaction(@PathVariable Integer id) {
+        // Call the service layer to audit the transaction category and return the updated transaction
+        return ResponseEntity.ok(transactionService.setTransactionAuditStatus(id, true));
+    }
+
+    @PatchMapping("/transactions/unaudit/{id}")
+    public ResponseEntity<?> unauditTransaction(@PathVariable Integer id) {
+        // Call the service layer to unaudit the transaction category and return the updated transaction
+        return ResponseEntity.ok(transactionService.setTransactionAuditStatus(id, false));
+    }
+
+
 
 }

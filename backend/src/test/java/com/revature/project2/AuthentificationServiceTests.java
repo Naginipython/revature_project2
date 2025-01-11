@@ -11,6 +11,8 @@ import com.revature.project2.services.AuthenticationService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.security.core.Authentication;
@@ -164,14 +166,26 @@ public class AuthentificationServiceTests {
         Assertions.assertTrue(returnObj.isEmpty());
     }
 
-    @Test
-    public void test_validateCurrentUserRole(){
+    @ParameterizedTest
+    @CsvSource({"ROLE_EMPLOYEE, ROLE_EMPLOYEE, true",
+            "ROLE_EMPLOYEE, ROLE_MANAGER, false",
+            "ROLE_MANAGER, ROLE_EMPLOYEE, true",
+            "ROLE_MANAGER, ROLE_MANAGER, true"})
+    public void test_validateCurrentUserRole(String userRole, String authRole, String resultString){
+        boolean result = Boolean.valueOf(resultString);
 
-        User user = new User("User","passwordEncoded", "user@user.com","user_fn","user_ln","ROLE_EMPLOYEE");
+        User user = new User("User","passwordEncoded", "user@user.com","user_fn","user_ln",userRole);
         when(passwordEncoder.encode("passwordEncoded")).thenReturn("password");
         UserDetails userDetails = new CustomUserDetails(user, passwordEncoder);
 
-        Authentication authentication = new JWTAuthObj("anonymousUser", true, userDetails.getAuthorities() );
+        Authentication authentication = new JWTAuthObj("User", true, userDetails.getAuthorities() );
+
+        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+
+        Assertions.assertTrue(authenticationService.validateCurrentUserRole(authRole)==result);
+
 
     }
 
