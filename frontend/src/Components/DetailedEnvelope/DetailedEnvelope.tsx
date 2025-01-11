@@ -9,7 +9,6 @@ import './DetailedEnvelope.scss';
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { Envelope, EnvelopeHistory, OutgoingTransaction, Transaction } from "./DetailedEnvelopeInterfaces";
-import backendHost from "../../backendHost";
 
 export const DetailedEnvelope:React.FC = () =>{
 
@@ -64,7 +63,7 @@ export const DetailedEnvelope:React.FC = () =>{
 
     const deleteEnvelope = async() => {
       if (user.loggedIn) {
-        axios.delete(`${backendHost}/envelopes/${id}`,{headers: {Authorization:`Bearer ${user.token}`, "Content-Type": "application/json"}, withCredentials: true})
+        axios.delete(`/envelopes/${id}`,{headers: {Authorization:`Bearer ${user.token}`, "Content-Type": "application/json"}, withCredentials: true})
         .then((response) => {
           console.log(response);
           toastAlert("Envelope deleted successfully!");
@@ -92,7 +91,7 @@ export const DetailedEnvelope:React.FC = () =>{
       if (currentTransaction?.title !== transactiontoEdit.title) {
         different = true;
         try{
-          await axios.patch(`${backendHost}/transactions/title/${transactiontoEdit.transactionId}`,transactiontoEdit.title,{headers: {Authorization:`Bearer ${user.token}`, "Content-Type": "text/plain"}, withCredentials: true});
+          await axios.patch(`/transactions/title/${transactiontoEdit.transactionId}`,transactiontoEdit.title,{headers: {Authorization:`Bearer ${user.token}`, "Content-Type": "text/plain"}, withCredentials: true});
           }
           catch(err){
             toastAlert("Error editing transaction title.");
@@ -103,7 +102,7 @@ export const DetailedEnvelope:React.FC = () =>{
       if (currentTransaction?.transactionDescription !== transactiontoEdit.transactionDescription) {
         different = true;
          try{
-          await axios.patch(`${backendHost}/transactions/description/${transactiontoEdit.transactionId}`,transactiontoEdit.transactionDescription,{headers: {Authorization:`Bearer ${user.token}`, "Content-Type": "text/plain"}, withCredentials: true});
+          await axios.patch(`/transactions/description/${transactiontoEdit.transactionId}`,transactiontoEdit.transactionDescription,{headers: {Authorization:`Bearer ${user.token}`, "Content-Type": "text/plain"}, withCredentials: true});
           }
           catch(err){
            toastAlert("Error editing transaction description.");
@@ -113,7 +112,7 @@ export const DetailedEnvelope:React.FC = () =>{
       if (currentTransaction?.category !== transactiontoEdit.category) {
         different = true;
          try{
-          await axios.patch(`${backendHost}/transactions/category/${transactiontoEdit.transactionId}`,transactiontoEdit.category,{headers: {Authorization:`Bearer ${user.token}`, "Content-Type": "text/plain"}, withCredentials: true});
+          await axios.patch(`/transactions/category/${transactiontoEdit.transactionId}`,transactiontoEdit.category,{headers: {Authorization:`Bearer ${user.token}`, "Content-Type": "text/plain"}, withCredentials: true});
           }
           catch(err){
            toastAlert("Error editing transaction category.");
@@ -180,7 +179,7 @@ export const DetailedEnvelope:React.FC = () =>{
         transactionAmount: transactiontoCreate.transactionAmount,
         category: transactiontoCreate.category,
       };
-        axios.post(`${backendHost}/envelopes/spend/${id}`,newTransaction,{headers: {Authorization:`Bearer ${user.token}`, "Content-Type": "application/json"}, withCredentials: true})
+        axios.post(`/envelopes/spend/${id}`,newTransaction,{headers: {Authorization:`Bearer ${user.token}`, "Content-Type": "application/json"}, withCredentials: true})
         .then((response) => {
           setTransactions([...transactions, {transactionId: response.data.transactionId, title: response.data.title, transactionAmount: response.data.transactionAmount, datetime: new Date(response.data.datetime), transactionDescription: response.data.transactionDescription, category: response.data.category}]);
           setEnvelope({...envelope, balance: envelope.balance + response.data.transactionAmount});
@@ -201,7 +200,7 @@ export const DetailedEnvelope:React.FC = () =>{
       if(user.loggedIn){
         //fetch envelope info
         axios
-          .get(`${backendHost}/envelopes/${id}`, {
+          .get(`/envelopes/${id}`, {
             headers: {
               Authorization: `Bearer ${user.token}`,
               "Content-Type": "application/json",
@@ -235,7 +234,7 @@ export const DetailedEnvelope:React.FC = () =>{
 
         //fetch transactions
         axios
-          .get(`${backendHost}/transactions/envelope/${id}`, {
+          .get(`/transactions/envelope/${id}`, {
             headers: {
               Authorization: `Bearer ${user.token}`,
               "Content-Type": "application/json",
@@ -272,7 +271,7 @@ export const DetailedEnvelope:React.FC = () =>{
 
         // get envelope balance history
         axios
-          .get(`${backendHost}/envelopes/history/${id}`, {
+          .get(`/envelopes/history/${id}`, {
             headers: {
               Authorization: `Bearer ${user.token}`,
               "Content-Type": "application/json",
