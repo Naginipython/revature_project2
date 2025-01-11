@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Card, CardContent, CardHeader, Dialog, DialogActions, DialogContent, DialogTitle, Grid2, IconButton, ListItem, Menu, MenuItem, Snackbar, Stack, TextField, Typography } from "@mui/material";
 import axios from "axios";
 import { CloseOutlined, ExpandCircleDown } from "@mui/icons-material";
-import backendHost from "../../backendHost";
 
 
 interface Envelope {
@@ -85,7 +84,7 @@ export const AllTransactions: React.FC = () => {
       different = true;
       try {
         await axios.patch(
-          `${backendHost}/transactions/title/${transactiontoEdit.transactionId}`,
+          `/transactions/title/${transactiontoEdit.transactionId}`,
           transactiontoEdit.title,
           {
             headers: {
@@ -107,7 +106,7 @@ export const AllTransactions: React.FC = () => {
       different = true;
       try {
         await axios.patch(
-          `${backendHost}/transactions/description/${transactiontoEdit.transactionId}`,
+          `/transactions/description/${transactiontoEdit.transactionId}`,
           transactiontoEdit.transactionDescription,
           {
             headers: {
@@ -126,7 +125,7 @@ export const AllTransactions: React.FC = () => {
       different = true;
       try {
         await axios.patch(
-          `${backendHost}/transactions/category/${transactiontoEdit.transactionId}`,
+          `/transactions/category/${transactiontoEdit.transactionId}`,
           transactiontoEdit.category,
           {
             headers: {
@@ -170,7 +169,7 @@ export const AllTransactions: React.FC = () => {
   useEffect(() => {
     if (user.loggedIn){
         axios
-        .get(`${backendHost}/transactions`, {
+        .get(`/transactions`, {
             headers: {
             Authorization: `Bearer ${user.token}`,
             "Content-Type": "application/json",

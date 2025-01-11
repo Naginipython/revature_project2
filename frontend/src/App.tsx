@@ -12,6 +12,7 @@ import SeeUsers from "./Components/SeeUsers/SeeUsers";
 import useStore from "./stores";
 import { Alert, Snackbar } from "@mui/material";
 import { AllTransactions } from "./Components/Transactions/AllTransactions";
+import axios from "axios";
 
 function App() {
   const setUser = useStore((state) => state.setUser);
@@ -39,7 +40,7 @@ function App() {
   const handleCloseSnackbar = () => {
     setSnackbar(false, "");
   };
-
+  axios.defaults.baseURL = 'http://44.204.237.144:8080'; 
   return (
     <>
       <BrowserRouter>
