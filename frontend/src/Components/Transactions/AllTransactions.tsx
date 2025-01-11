@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Card, CardContent, CardHeader, Dialog, DialogActions, DialogContent, DialogTitle, Grid2, IconButton, ListItem, Menu, MenuItem, Snackbar, Stack, TextField, Typography } from "@mui/material";
 import axios from "axios";
 import { CloseOutlined, ExpandCircleDown } from "@mui/icons-material";
+import backendHost from "../../backendHost";
 
 
 interface Envelope {
@@ -84,7 +85,7 @@ export const AllTransactions: React.FC = () => {
       different = true;
       try {
         await axios.patch(
-          `/transactions/title/${transactiontoEdit.transactionId}`,
+          `${backendHost}/transactions/title/${transactiontoEdit.transactionId}`,
           transactiontoEdit.title,
           {
             headers: {
@@ -106,7 +107,7 @@ export const AllTransactions: React.FC = () => {
       different = true;
       try {
         await axios.patch(
-          `/transactions/description/${transactiontoEdit.transactionId}`,
+          `${backendHost}/transactions/description/${transactiontoEdit.transactionId}`,
           transactiontoEdit.transactionDescription,
           {
             headers: {
@@ -125,7 +126,7 @@ export const AllTransactions: React.FC = () => {
       different = true;
       try {
         await axios.patch(
-          `/transactions/category/${transactiontoEdit.transactionId}`,
+          `${backendHost}/transactions/category/${transactiontoEdit.transactionId}`,
           transactiontoEdit.category,
           {
             headers: {

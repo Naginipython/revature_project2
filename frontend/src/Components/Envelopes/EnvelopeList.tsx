@@ -4,6 +4,7 @@ import { EnvelopeListCard } from "./EnvelopeListCard";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { IconButton, Tooltip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import backendHost from "../../backendHost";
 
 interface UserData {
   userId: number;
@@ -39,7 +40,7 @@ export const EnvelopeList = () => {
       console.log(user);
       console.log(user.userId);
       const response = await fetch(
-        `/envelopes/user/${user.userId}`,
+        `${backendHost}/envelopes/user/${user.userId}`,
         {
           method: "GET",
           credentials: "include",

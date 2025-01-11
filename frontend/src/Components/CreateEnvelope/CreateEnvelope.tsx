@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import useStore, { UserInfo } from "../../stores";
 import "./CreateEnvelope.css";
 import { useNavigate } from "react-router-dom";
+import backendHost from "../../backendHost";
 
 
 export const CreateEnvelope: React.FC = () => {
@@ -39,7 +40,7 @@ export const CreateEnvelope: React.FC = () => {
         e.preventDefault();
         const parsedBalance = parseFloat(balance);
         const parsedLimit = parseFloat(limit);
-        fetch("/envelopes", {
+        fetch(`${backendHost}/envelopes`, {
             method: "POST",
             credentials: "include",
             headers: {

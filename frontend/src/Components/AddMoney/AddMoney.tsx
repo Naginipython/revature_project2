@@ -6,6 +6,7 @@ import { Envelope } from './AddMoneyInterfaces';
 import useStore from "../../stores";
 import { UserInfo } from "../../stores";
 import "./AddMoney.css";
+import backendHost from "../../backendHost";
 
 export const AddMoney: React.FC = () => {
     const [envs, setEnvs] = useState<Envelope[]>([]);
@@ -29,7 +30,7 @@ export const AddMoney: React.FC = () => {
         ) {
             const fetchPromises = envs.map((env) => {
                 if (parseInt(env.amount) > 0) {
-                    return fetch(`/envelopes/allocate/${env.envelope_id}`, {
+                    return fetch(`${backendHost}/envelopes/allocate/${env.envelope_id}`, {
                         method: "POST",
                         credentials: "include",
                         headers: {
@@ -59,7 +60,7 @@ export const AddMoney: React.FC = () => {
 
     // Fetches all envelopes
     useEffect(() => {
-        fetch("/envelopes", {
+        fetch(`${backendHost}/envelopes`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
