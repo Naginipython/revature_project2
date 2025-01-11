@@ -2,16 +2,23 @@
 
 .envelope {
 	&-container {
-		@include util.flex($dir: column, $align: center, $x-align: flex-start, $gap: 10px);
-		width: 100vw;
-		margin-top: 30px;
+		@include util.flex($dir: column, $align: center, $x-align: flex-start, $gap: 30px);
+		width: calc(100vw - 100px);
+		margin: 40px 0px 40px 40px;
+		
 	}
 
 	&-row {
 		@include util.flex($dir: row, $align: flex-start, $x-align: flex-start, $gap: 20px);
 		justify-items: center;
 		overflow-x: auto;
-		width: 100vw;
+		width: calc(100vw - 100px);
+		background-image: linear-gradient(to right, #eeeeee, #e0e0e0);
+		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+
+		&-group {	
+			@include util.flex($dir: column, $align: center, $x-align: flex-start, $gap: 15px);
+		}
 	}
 
 	&-header {
@@ -47,11 +54,26 @@
 	&-title {
 		font-size: 3em;
 		font-weight: 600;
+
+		&-group {
+			@include util.flex($dir: row, $align: center, $x-align: flex-start, $gap: 15px);
+		}
 	}
 
 	&-subtitle {
 		font-size: 2em;
-		font-weight: 400;
+		font-weight: 500;
+		// lol
+		&-sub {
+			font-size: 1.5em;
+			font-weight: 400;
+		}
+	}
+
+	&-hr {
+		border-top: 1px solid #eeeeee;
+		width: 100%;
+		max-width: 400px; margin-left:0;
 	}
 }
 
