@@ -1,5 +1,5 @@
-import {CloseOutlined, ExpandCircleDown } from "@mui/icons-material";
-import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Card, CardContent, CardHeader, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Grid2, IconButton, InputAdornment, ListItem, Menu, MenuItem, Snackbar, Stack, TextField, Typography } from "@mui/material"
+import {Add, AttachMoney, CloseOutlined, Delete, ExpandCircleDown } from "@mui/icons-material";
+import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Card, CardContent, CardHeader, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid2, IconButton, InputAdornment, LinearProgress, ListItem, Menu, MenuItem, Snackbar, Stack, TextField, Typography } from "@mui/material"
 import { LineChart } from "@mui/x-charts";
 import { useEffect, useState } from "react";
 import {UserInfo} from "../../stores";
@@ -33,8 +33,8 @@ export const DetailedEnvelope:React.FC = () =>{
 
     const [openEdit, setOpenEdit] = useState(false);
     const [openCreate, setOpenCreate] = useState(false);
-    const [transactiontoEdit, setTransactiontoEdit] = useState<Transaction>({transactionId: 0, title: "", transactionAmount: 0, datetime: new Date(), transactionDescription: "", category: "Spending"});
-    const [transactiontoCreate, setTransactiontoCreate] = useState<OutgoingTransaction>({title: "", transactionAmount: 0, transactionDescription: "", category: ""});
+    const [transactiontoEdit, setTransactiontoEdit] = useState<Transaction>({transactionId: 0, title: "", transactionAmount: 0, datetime: new Date(), transactionDescription: "", category: ""});
+    const [transactiontoCreate, setTransactiontoCreate] = useState<OutgoingTransaction>({title: "", transactionAmount: 0, transactionDescription: "", category: "Spending"});
     const [createAmountError, setCreateAmountError] = useState(false);
     const [edited, setEdited] = useState(false);
 
@@ -185,7 +185,7 @@ export const DetailedEnvelope:React.FC = () =>{
           setEnvelope({...envelope, balance: envelope.balance + response.data.transactionAmount});
           setEnvelopeHistory([...envelopeHistory, {amountHistoryId: 0, envelope: envelope, transaction: response.data, envelopeAmount: envelope.balance+ response.data.transactionAmount}]);
           setAllCategories([...new Set([...allCategories, response.data.category])]);
-          setRemaining(remaining+response.data.transactionAmount);
+          setRemaining(((envelope.balance+response.data.transactionAmount)/envelope.maxLimit)*100);
           toastAlert("Transaction created successfully!");
           console.log(envelopeHistory);
         }).catch((err) => {
@@ -208,16 +208,22 @@ export const DetailedEnvelope:React.FC = () =>{
             withCredentials: true,
           })
           .then((response) => {
-            setEnvelope({
-              envelopeId: response.data.envelope_id,
-              user: response.data.user,
-              envelopeDescription: response.data.envelopeDescription,
-              maxLimit: response.data.maxLimit,
-              balance: response.data.balance,
-            });
-            setRemaining(response.data.maxLimit - response.data.balance);
-            if (response.data.maxLimit - response.data.balance < 100) {
-              setStatusColor(statusColors.low);
+            if (user.role!="ROLE_MANAGER" && response.data.user.userId !== user.userId) {
+              toastAlert("You do not have access to this envelope.");
+              navigate("/envelopes");
+            }
+            else{
+              setEnvelope({
+                envelopeId: response.data.envelope_id,
+                user: response.data.user,
+                envelopeDescription: response.data.envelopeDescription,
+                maxLimit: response.data.maxLimit,
+                balance: response.data.balance,
+              });
+              setRemaining((response.data.balance/response.data.maxLimit)*100);
+              if (response.data.balance < 100) {
+                setStatusColor(statusColors.low);
+              }
             }
           })
           .catch((err) => {
@@ -318,7 +324,7 @@ export const DetailedEnvelope:React.FC = () =>{
                 alignItems: "center",
                 maxWidth: { xs: "90%", md: "70%" },
               }}
-              id="mainContainer"
+              id="detailedContainer"
             >
               {/* Each subsequent child Grid2 element represents a row/column. Size of a row in a grid is 12, so we use size prop to adjust the width of the column. */}
               <Grid2
@@ -339,7 +345,7 @@ export const DetailedEnvelope:React.FC = () =>{
                   }}
                   variant="outlined"
                 >
-                  {/* CardHeader component to display envelope description and remaining amount (balance - max limit) */}
+                  {/* CardHeader component to display envelope description and remaining amount (balance / max limit)*100 */}
                   <CardHeader
                     sx={{
                       backgroundColor: statusColor,
@@ -375,6 +381,7 @@ export const DetailedEnvelope:React.FC = () =>{
                               ${envelope.balance}
                             </Typography>
                           </ListItem>
+                            
                         </Stack>
                       </>
                     }
@@ -400,23 +407,9 @@ export const DetailedEnvelope:React.FC = () =>{
                           ${envelope.maxLimit}
                         </Typography>
                       </Grid2>
+                      {/* Remaining amount is calculated by dividing balance by limit, and taking as percentage */}
                       <Grid2 size={12}>
-                        <Divider />
-                      </Grid2>
-                      {/* Remaining amount is calculated by subtracting the max limit from the balance */}
-                      <Grid2 size={6}>
-                        <Typography variant="h5">
-                          Remaining for addition
-                        </Typography>
-                      </Grid2>
-                      <Grid2 size={6}>
-                        <Typography variant="h5">
-                          {remaining > 0 ? (
-                            <>${remaining}</>
-                          ) : (
-                            <>-${Math.abs(remaining)}</>
-                          )}
-                        </Typography>
+                        <LinearProgress color="success" sx={{height:8}} variant="determinate" value={remaining}></LinearProgress>
                       </Grid2>
                     </Grid2>
                   </CardContent>
@@ -436,9 +429,11 @@ export const DetailedEnvelope:React.FC = () =>{
                           <Typography variant="h5" sx={{ fontWeight: "bold" }}>
                             Transactions
                           </Typography>
+
+
                           {/* Filter and Options buttons */}
-                          
-                          <Button id="categoryButton" onClick={()=>{setFilterMenu(true)}}>Filter</Button>
+                          <Button id="categoryButton" size="small"onClick={()=>{setFilterMenu(true)}}>Filter{filteredCategory === "All" ? "" : `: ${filteredCategory}`}</Button>
+        
                           {envelope.user !=null ?
                           <Button
                             onClick={() => {
@@ -450,6 +445,8 @@ export const DetailedEnvelope:React.FC = () =>{
                             Options
                           </Button>
                           : <></>}
+
+
                           {/* Menu for creating transactions */}
                           <Menu
                             open={transactionMenu}
@@ -471,7 +468,7 @@ export const DetailedEnvelope:React.FC = () =>{
                                 navigate("/add");
                               }}
                             >
-                              Add Money
+                              <Add/>Add Money
                             </MenuItem>
                             <MenuItem
                               onClick={() => {
@@ -479,14 +476,14 @@ export const DetailedEnvelope:React.FC = () =>{
                                 setTransactionMenu(false);
                               }}
                             >
-                              Spend Money
+                              <AttachMoney/>Spend Money
                             </MenuItem>
                             <MenuItem sx={{ color: "red" }}
                               onClick={() => {
                                 setDeleteDialog(true);
                               }}
                             >
-                              Delete Envelope
+                              <Delete/>Delete Envelope
                             </MenuItem>
                           </Menu>
 
@@ -503,6 +500,7 @@ export const DetailedEnvelope:React.FC = () =>{
                                 onClick={() => {
                                   deleteEnvelope();
                                 }}
+                                
                               >
                                 Yes
                               </Button>
@@ -525,18 +523,18 @@ export const DetailedEnvelope:React.FC = () =>{
                             anchorEl={document.getElementById("categoryButton")}
                             anchorOrigin={{
                               vertical: "bottom",
-                              horizontal: "left",
+                              horizontal: "right",
                             }}
-                            transformOrigin={{
-                              vertical: "top",
-                              horizontal: "left",
-                            }}
+                            sx ={{overflowY: "auto"}}
                           >
+                            
                             <MenuItem sx={{ fontWeight: "bold" }}
                               onClick={() => {
                                 setFilteredCategory("All");
                                 setFilterMenu(false);
                               }}>All</MenuItem>
+                              <MenuItem sx={{ fontWeight: "bold" }} disabled
+                              >Category</MenuItem>
                             {allCategories.map((category) => {
                               return (
                                 <MenuItem 

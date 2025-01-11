@@ -11,6 +11,7 @@ import { useEffect } from "react";
 import SeeUsers from "./Components/SeeUsers/SeeUsers";
 import useStore from "./stores";
 import { Alert, Snackbar } from "@mui/material";
+import { AllTransactions } from "./Components/Transactions/AllTransactions";
 
 function App() {
   const setUser = useStore((state) => state.setUser);
@@ -49,9 +50,11 @@ function App() {
           <Route path="/personalize" element={<Personalize />} />
           <Route path="/new_envelope" element={<CreateEnvelope />} />
           <Route path="/envelopes" element={<EnvelopeList />} />
-          <Route path="/en/:id" element={<DetailedEnvelope />} />
+          <Route path="/envelope/:id" element={<DetailedEnvelope />} />
+          <Route path="/transactions" element={<AllTransactions />} />
           <Route path="/add" element={<AddMoney />} />
           <Route path="/users" element={<SeeUsers />} />
+          <Route path="/transactions" element = {<AllTransactions />} />
         </Routes>
       </BrowserRouter>
       <Snackbar
