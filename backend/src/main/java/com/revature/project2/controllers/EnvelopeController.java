@@ -31,6 +31,11 @@ public class EnvelopeController {
         return envelopeService.getEnvelopeById(envelopeId);
     }
 
+    @GetMapping("user/{userId}")
+    public ResponseEntity<?> getEnvelopeByUserId(@PathVariable Integer userId) {
+        return envelopeService.getEnvelopeByUserId(userId);
+    }
+
     @DeleteMapping("/{envelopeId}")
     public ResponseEntity<?> deleteEnvelope(@PathVariable Integer envelopeId) {
         return envelopeService.deleteEnvelope(envelopeId);

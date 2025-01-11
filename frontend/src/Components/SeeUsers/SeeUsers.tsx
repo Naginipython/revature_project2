@@ -19,7 +19,7 @@ export default function () {
     useEffect(() => {
         // Fetch users from the server
         console.log(u);
-        fetch("http://localhost:8080/users", {
+        fetch("/users", {
             method: "GET",
             credentials: "include",
             headers: {
@@ -38,7 +38,7 @@ export default function () {
 
     const handleDeleteUser = (username: string) => {
         // Delete user
-        fetch(`http://localhost:8080/users/${username}`, {
+        fetch(`/users/${username}`, {
             method: "DELETE",
             credentials: "include",
             headers: {

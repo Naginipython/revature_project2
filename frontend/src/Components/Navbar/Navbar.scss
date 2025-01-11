@@ -25,6 +25,12 @@
   margin-left: 10px;
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2); 
   transition: all 0.3s ease-in-out; 
+
+  &-main {
+    @extend .oval-button;
+    color: var(--white) !important;
+    background-color: var(--dark-green) !important; 
+  }
 }
 
 .oval-button:focus {

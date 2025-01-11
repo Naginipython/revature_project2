@@ -27,11 +27,8 @@ public class EnvelopeHistoryService {
     public ResponseEntity<?> getEnvelopeHistoryByEnvelopeId(Integer envelopeId) {
         logger.info("Retrieving envelope history by id: " + envelopeId);
         List<EnvelopeHistory> envelopeHistory = envelopeHistoryRepository.findByEnvelope_EnvelopeId(envelopeId);
-        if (envelopeHistory.isEmpty()) {
-            return ResponseEntity.badRequest().body("Envelope history with Envelope id " + envelopeId + " does not exist");
-        } else {
-            return ResponseEntity.ok(envelopeHistory);
-        }
+        logger.info("Retrieved envelope history with id: " + envelopeHistory);
+        return ResponseEntity.ok(envelopeHistory);
     }
 
     public ResponseEntity<?> createEnvelopeHistory(EnvelopeHistory envelopeHistory) {

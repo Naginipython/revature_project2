@@ -1,111 +1,155 @@
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import Typography from '@mui/material/Typography';
-import { EnvelopeListCard } from './EnvelopeListCard';
+import { useState, useEffect } from "react";
+import useStore, { UserInfo } from "../../stores";
+import { EnvelopeListCard } from "./EnvelopeListCard";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import { IconButton, Tooltip } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
-interface History {
-	amount_history_id: number,
-	envelope_id: number,
-	transaction_id: number,
-	envelope_amount: number
+interface UserData {
+  userId: number;
+  username: string;
+  email: string;
+  role: string;
+  firstName: string;
+  lastName: string;
 }
 
 interface Envelope {
-	envelope_id: number,
-	user_id: number,
-	envelope_description: string,
-	balance: number,
-	max_limit: number,
-	envelope_history: History[],
+  envelopeId: number;
+  user_id: number;
+  envelopeDescription: string;
+  balance: number;
+  maxLimit: number;
+  user: UserData;
 }
 
-export const EnvelopeList: React.FC = () => {
+export const EnvelopeList = () => {
+  const user: UserInfo = useStore((state: any) => state.user);
+  const [envelopeList, setEnvelopeList] = useState<Envelope[]>([]);
+  const navigate = useNavigate();
 
-	let envelopes: Envelope[] = [];
+  useEffect(() => {
+    if (user?.token) {
+      loadEnvelopeList();
+    }
+  }, [user?.token]);
 
-	// Examples for paid, nearly used, over budget envelopes
-	for (let i = 0; i < 10; i++) {
-		envelopes.push({
-			envelope_id: i,
-			user_id: 1,
-			envelope_description: "asdf",
-			balance: 999,
-			max_limit: 999,
-			envelope_history: [
-				{amount_history_id: i, envelope_id: i, transaction_id: i, envelope_amount: 69},
-				{amount_history_id: i, envelope_id: i, transaction_id: i, envelope_amount: 69},
-				{amount_history_id: i, envelope_id: i, transaction_id: i, envelope_amount: 69}
-			]
-		});
-	}
+  const loadEnvelopeList = async () => {
+    try {
+      console.log(user);
+      console.log(user.userId);
+      const response = await fetch(
+        `/envelopes/user/${user.userId}`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+      if (!response.ok) {
+        console.log("Error fetching envelopes");
+      }
+      const data = await response.json();
+      setEnvelopeList(data); // Update state
+      console.log(data);
+    } catch (error) {
+      console.error("Error fetching envelopes:", error);
+    }
+  };
 
-	for (let i = 10; i < 15; i++) {
-		envelopes.push({
-			envelope_id: i,
-			user_id: 1,
-			envelope_description: "asdf",
-			balance: 499,
-			max_limit: 999,
-			envelope_history: [
-				{amount_history_id: i, envelope_id: i, transaction_id: i, envelope_amount: 69},
-				{amount_history_id: i, envelope_id: i, transaction_id: i, envelope_amount: 69},
-				{amount_history_id: i, envelope_id: i, transaction_id: i, envelope_amount: 69}
-			]
-		});
-	}
-
-	for (let i = 15; i < 18; i++) {
-		envelopes.push({
-			envelope_id: i,
-			user_id: 1,
-			envelope_description: "asdf",
-			balance: -40,
-			max_limit: 999,
-			envelope_history: [
-				{amount_history_id: i, envelope_id: i, transaction_id: i, envelope_amount: 69},
-				{amount_history_id: i, envelope_id: i, transaction_id: i, envelope_amount: 69},
-				{amount_history_id: i, envelope_id: i, transaction_id: i, envelope_amount: 69}
-			]
-		});
-	}
-
-	// Horribly inefficient way to render different tiers of envelopes, but whatever
-	return (
-		<div className = "envelope-container">
-			<p className = "envelope-title">My Envelopes</p>
-			<p className = "envelope-subtitle">Within Budget</p>
-			<div className="envelope-row">
-				{envelopes.map((env) => {
-					// Within Budget - more than half balance remaining
-					if (env.balance >= env.max_limit / 2) {
-						return (
-							<EnvelopeListCard colorClass = {"envelope-header-good"} envelope = {env} />
-						)
-					}
-				})}
-			</div>
-			<p className = "envelope-subtitle">Nearly Used</p>
-			<div className="envelope-row">
-				{envelopes.map((env) => {
-					// Nearly Used - less than half, but still non zero balance
-					if ((env.balance > 0) && (env.balance < env.max_limit / 2)) {
-						return (
-							<EnvelopeListCard colorClass = {"envelope-header-warning"} envelope = {env} />
-						)
-					}
-				})}
-			</div>
-			<p className = "envelope-subtitle">Over Budget</p>
-			<div className="envelope-row">
-				{envelopes.map((env) => {
-					// Over Budget - balance is zero or negative
-					if (env.balance <= 0) {
-						return (
-							<EnvelopeListCard colorClass = {"envelope-header-danger"} envelope = {env} />
-						)
-					}
-				})}
-			</div>
-		</div>
-	)
-}
+  // Horribly inefficient way to render different tiers of envelopes, but whatever
+  return (
+    <div className="envelope-container">
+      <div className="envelope-title-group">
+        <p className="envelope-title">My Envelopes</p>
+        <Tooltip title="Add new envelope" placement="bottom" arrow>
+          <IconButton
+            aria-label="add"
+            size="large"
+            onClick={() => navigate("/new_envelope")}
+          >
+            <AddCircleOutlineIcon fontSize="inherit" />
+          </IconButton>
+        </Tooltip>
+      </div>
+	  <hr className = "envelope-hr"/>
+      {/* No envelopes, prompts to create one */}
+      {envelopeList.length === 0 &&
+        <div>
+          <p className="envelope-subtitle">You have no envelopes...</p>
+		  <br />
+          <p className="envelope-subtitle-sub">Create a new envelope by clicking the + above!</p>
+        </div>
+      }
+      <div className="envelope-row-group">
+        {/* Shows if there are envelopes within the budget */}
+        {envelopeList.some((env) => env.balance >= env.maxLimit / 2) &&
+          <div>
+            <p className="envelope-subtitle">Within Budget</p>
+            <div className="envelope-row">
+              {envelopeList.map((env) => {
+                console.log(env.balance, env.maxLimit);
+                // Within Budget - more than half balance remaining
+                if (env.balance >= env.maxLimit / 2) {
+                  return (
+                    <EnvelopeListCard
+                      key={env.envelopeId}
+                      colorClass={"envelope-header-good"}
+                      envelope={env}
+                      onClick={() => console.log(env.envelopeId)}
+                    />
+                  );
+                }
+              })}
+            </div>
+          </div>
+        }
+        {/* Shows if there are envelopes nearly used */}
+        {envelopeList.some((env) => env.balance > 0 && env.balance < env.maxLimit / 2) &&
+          <div>
+            <p className="envelope-subtitle">Nearly Used</p>
+            <div className="envelope-row">
+              {envelopeList.map((env) => {
+                // Nearly Used - less than half, but still non zero balance
+                if (env.balance > 0 && env.balance < env.maxLimit / 2) {
+                  return (
+                    <EnvelopeListCard
+                      key={env.envelopeId}
+                      colorClass={"envelope-header-warning"}
+                      envelope={env}
+                      onClick={() => console.log(env.envelopeId)}
+                    />
+                  );
+                }
+              })}
+            </div>
+          </div>
+        }
+        {/* Shows if there are envelopes over budget */}
+        {envelopeList.some((env) => env.balance <= 0) &&
+          <div>
+            <p className="envelope-subtitle">Over Budget</p>
+            <div className="envelope-row">
+              {envelopeList.map((env) => {
+                // Over Budget - balance is zero or negative
+                if (env.balance <= 0) {
+                  return (
+                    <EnvelopeListCard
+                      key={env.envelopeId}
+                      colorClass={"envelope-header-danger"}
+                      envelope={env}
+                      onClick={() => console.log(env.envelopeId)}
+                    />
+                  );
+                }
+              })}
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  );
+};

@@ -39,7 +39,7 @@ export const CreateEnvelope: React.FC = () => {
         e.preventDefault();
         const parsedBalance = parseFloat(balance);
         const parsedLimit = parseFloat(limit);
-        fetch("http://localhost:8080/envelopes", {
+        fetch("/envelopes", {
             method: "POST",
             credentials: "include",
             headers: {

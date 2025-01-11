@@ -40,6 +40,11 @@ public class Envelope {
         this.maxLimit = maxLimit;
     }
 
+    @PreRemove
+    private void removeFromUser(){
+        this.user.getEnvelopes().remove(this);
+    }
+
     public int getEnvelopeId() {
         return envelopeId;
     }

@@ -1,5 +1,5 @@
-import {CloseOutlined, ExpandCircleDown } from "@mui/icons-material";
-import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Card, CardContent, CardHeader, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Grid2, IconButton, InputAdornment, ListItem, Menu, MenuItem, Snackbar, Stack, TextField, Typography } from "@mui/material"
+import {Add, AttachMoney, CloseOutlined, Delete, ExpandCircleDown } from "@mui/icons-material";
+import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Card, CardContent, CardHeader, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid2, IconButton, InputAdornment, LinearProgress, ListItem, Menu, MenuItem, Snackbar, Stack, TextField, Typography } from "@mui/material"
 import { LineChart } from "@mui/x-charts";
 import { useEffect, useState } from "react";
 import {UserInfo} from "../../stores";
@@ -29,13 +29,19 @@ export const DetailedEnvelope:React.FC = () =>{
     const [remaining, setRemaining] = useState(0);
 
     const [transactionMenu, setTransactionMenu] = useState(false);
+    const [filterMenu, setFilterMenu] = useState(false);  
+
     const [openEdit, setOpenEdit] = useState(false);
     const [openCreate, setOpenCreate] = useState(false);
     const [transactiontoEdit, setTransactiontoEdit] = useState<Transaction>({transactionId: 0, title: "", transactionAmount: 0, datetime: new Date(), transactionDescription: "", category: ""});
-    const [transactiontoCreate, setTransactiontoCreate] = useState<OutgoingTransaction>({title: "", transactionAmount: 0, transactionDescription: "", category: ""});
+    const [transactiontoCreate, setTransactiontoCreate] = useState<OutgoingTransaction>({title: "", transactionAmount: 0, transactionDescription: "", category: "Spending"});
     const [createAmountError, setCreateAmountError] = useState(false);
     const [edited, setEdited] = useState(false);
+
+    const [allCategories, setAllCategories] = useState<string[]>([]);
+    const[filteredCategory, setFilteredCategory] = useState<string>("All");
     
+    const [deleteDialog, setDeleteDialog] = useState(false);
 
     const [loading, setLoading] = useState(true);
     const [showAlert, setShowAlert] = useState(false);
@@ -55,6 +61,21 @@ export const DetailedEnvelope:React.FC = () =>{
     }
 
 
+    const deleteEnvelope = async() => {
+      if (user.loggedIn) {
+        axios.delete(`/envelopes/${id}`,{headers: {Authorization:`Bearer ${user.token}`, "Content-Type": "application/json"}, withCredentials: true})
+        .then((response) => {
+          console.log(response);
+          toastAlert("Envelope deleted successfully!");
+          navigate("/envelopes");
+        })
+        .catch((err) => {
+          toastAlert("Error deleting envelope.");
+          console.error(err);
+        });
+      }
+    }
+
     // Transaction editing functions
     const changeEditTransactionValues = (event:any) =>{
       setTransactiontoEdit({...transactiontoEdit, [event.target.name]: event.target.value});
@@ -70,7 +91,7 @@ export const DetailedEnvelope:React.FC = () =>{
       if (currentTransaction?.title !== transactiontoEdit.title) {
         different = true;
         try{
-          await axios.patch(`http://localhost:8080/transactions/title/${transactiontoEdit.transactionId}`,transactiontoEdit.title,{headers: {Authorization:`Bearer ${user.token}`, "Content-Type": "text/plain"}, withCredentials: true});
+          await axios.patch(`/transactions/title/${transactiontoEdit.transactionId}`,transactiontoEdit.title,{headers: {Authorization:`Bearer ${user.token}`, "Content-Type": "text/plain"}, withCredentials: true});
           }
           catch(err){
             toastAlert("Error editing transaction title.");
@@ -81,7 +102,7 @@ export const DetailedEnvelope:React.FC = () =>{
       if (currentTransaction?.transactionDescription !== transactiontoEdit.transactionDescription) {
         different = true;
          try{
-          await axios.patch(`http://localhost:8080/transactions/description/${transactiontoEdit.transactionId}`,transactiontoEdit.transactionDescription,{headers: {Authorization:`Bearer ${user.token}`, "Content-Type": "text/plain"}, withCredentials: true});
+          await axios.patch(`/transactions/description/${transactiontoEdit.transactionId}`,transactiontoEdit.transactionDescription,{headers: {Authorization:`Bearer ${user.token}`, "Content-Type": "text/plain"}, withCredentials: true});
           }
           catch(err){
            toastAlert("Error editing transaction description.");
@@ -91,7 +112,7 @@ export const DetailedEnvelope:React.FC = () =>{
       if (currentTransaction?.category !== transactiontoEdit.category) {
         different = true;
          try{
-          await axios.patch(`http://localhost:8080/transactions/category/${transactiontoEdit.transactionId}`,transactiontoEdit.category,{headers: {Authorization:`Bearer ${user.token}`, "Content-Type": "text/plain"}, withCredentials: true});
+          await axios.patch(`/transactions/category/${transactiontoEdit.transactionId}`,transactiontoEdit.category,{headers: {Authorization:`Bearer ${user.token}`, "Content-Type": "text/plain"}, withCredentials: true});
           }
           catch(err){
            toastAlert("Error editing transaction category.");
@@ -100,16 +121,20 @@ export const DetailedEnvelope:React.FC = () =>{
 
       if (different) {
         toastAlert("Transaction edited successfully!");
-
+        let newCategories:string[] = [];
         setTransactions(
         transactions.map((transaction) => {
           if (transaction.transactionId === transactiontoEdit.transactionId) {
+            newCategories.push(transactiontoEdit.category);
             return { ...transaction, title: transactiontoEdit.title, transactionDescription: transactiontoEdit.transactionDescription, category: transactiontoEdit.category };
+
           } else {
+            newCategories.push(transaction.category);
             return transaction;
           }
         })
-      );
+        );
+        setAllCategories([...new Set(newCategories)]);
       }
       else{
         toastAlert("No changes made to transaction.");
@@ -134,10 +159,16 @@ export const DetailedEnvelope:React.FC = () =>{
 
 
     const handleCreateClose = () =>{
-      setTransactiontoCreate({title: "", transactionAmount: 0, transactionDescription: "", category: ""});
+      setTransactiontoCreate({title: "", transactionAmount: 0, transactionDescription: "", category: "Spending"});
       setOpenCreate(false);
       setCreateAmountError(false);
 
+    }
+
+    const handleCreateOpen= () =>{
+      setTransactiontoCreate({title: "", transactionAmount: 0, transactionDescription: "", category: "Spending"});
+      setOpenCreate(true);
+      setCreateAmountError(false);
     }
 
     const createTransaction = async(event:any) => {
@@ -148,12 +179,15 @@ export const DetailedEnvelope:React.FC = () =>{
         transactionAmount: transactiontoCreate.transactionAmount,
         category: transactiontoCreate.category,
       };
-        axios.post(`http://localhost:8080/envelopes/spend/${id}`,newTransaction,{headers: {Authorization:`Bearer ${user.token}`, "Content-Type": "application/json"}, withCredentials: true})
+        axios.post(`/envelopes/spend/${id}`,newTransaction,{headers: {Authorization:`Bearer ${user.token}`, "Content-Type": "application/json"}, withCredentials: true})
         .then((response) => {
           setTransactions([...transactions, {transactionId: response.data.transactionId, title: response.data.title, transactionAmount: response.data.transactionAmount, datetime: new Date(response.data.datetime), transactionDescription: response.data.transactionDescription, category: response.data.category}]);
           setEnvelope({...envelope, balance: envelope.balance + response.data.transactionAmount});
-          setRemaining(remaining+response.data.transactionAmount);
+          setEnvelopeHistory([...envelopeHistory, {amountHistoryId: 0, envelope: envelope, transaction: response.data, envelopeAmount: envelope.balance+ response.data.transactionAmount}]);
+          setAllCategories([...new Set([...allCategories, response.data.category])]);
+          setRemaining(((envelope.balance+response.data.transactionAmount)/envelope.maxLimit)*100);
           toastAlert("Transaction created successfully!");
+          console.log(envelopeHistory);
         }).catch((err) => {
           toastAlert("Error creating transaction.");
           console.error(err);
@@ -161,12 +195,12 @@ export const DetailedEnvelope:React.FC = () =>{
     }
 
 
-    // Fetch envelope info, transactions, and envelope history at component mount
+    // Fetch envelope info, transactions, categories and envelope history at component mount
     useEffect(()=>{
       if(user.loggedIn){
         //fetch envelope info
         axios
-          .get(`http://localhost:8080/envelopes/${id}`, {
+          .get(`/envelopes/${id}`, {
             headers: {
               Authorization: `Bearer ${user.token}`,
               "Content-Type": "application/json",
@@ -174,16 +208,22 @@ export const DetailedEnvelope:React.FC = () =>{
             withCredentials: true,
           })
           .then((response) => {
-            setEnvelope({
-              envelopeId: response.data.envelope_id,
-              user: response.data.user,
-              envelopeDescription: response.data.envelopeDescription,
-              maxLimit: response.data.maxLimit,
-              balance: response.data.balance,
-            });
-            setRemaining(response.data.maxLimit - response.data.balance);
-            if (response.data.maxLimit - response.data.balance < 100) {
-              setStatusColor(statusColors.low);
+            if (user.role!="ROLE_MANAGER" && response.data.user.userId !== user.userId) {
+              toastAlert("You do not have access to this envelope.");
+              navigate("/envelopes");
+            }
+            else{
+              setEnvelope({
+                envelopeId: response.data.envelope_id,
+                user: response.data.user,
+                envelopeDescription: response.data.envelopeDescription,
+                maxLimit: response.data.maxLimit,
+                balance: response.data.balance,
+              });
+              setRemaining((response.data.balance/response.data.maxLimit)*100);
+              if (response.data.balance < 100) {
+                setStatusColor(statusColors.low);
+              }
             }
           })
           .catch((err) => {
@@ -194,7 +234,7 @@ export const DetailedEnvelope:React.FC = () =>{
 
         //fetch transactions
         axios
-          .get(`http://localhost:8080/transactions/envelope/${id}`, {
+          .get(`/transactions/envelope/${id}`, {
             headers: {
               Authorization: `Bearer ${user.token}`,
               "Content-Type": "application/json",
@@ -222,6 +262,7 @@ export const DetailedEnvelope:React.FC = () =>{
                 fetchedTransactions.push(newTransaction);
               }
               setTransactions(fetchedTransactions);
+              setAllCategories([...new Set(fetchedTransactions.map((transaction) => transaction.category))]);
             }
           })
           .catch((err) => {
@@ -230,7 +271,7 @@ export const DetailedEnvelope:React.FC = () =>{
 
         // get envelope balance history
         axios
-          .get(`http://localhost:8080/envelopes/history/${id}`, {
+          .get(`/envelopes/history/${id}`, {
             headers: {
               Authorization: `Bearer ${user.token}`,
               "Content-Type": "application/json",
@@ -283,7 +324,7 @@ export const DetailedEnvelope:React.FC = () =>{
                 alignItems: "center",
                 maxWidth: { xs: "90%", md: "70%" },
               }}
-              id="mainContainer"
+              id="detailedContainer"
             >
               {/* Each subsequent child Grid2 element represents a row/column. Size of a row in a grid is 12, so we use size prop to adjust the width of the column. */}
               <Grid2
@@ -304,7 +345,7 @@ export const DetailedEnvelope:React.FC = () =>{
                   }}
                   variant="outlined"
                 >
-                  {/* CardHeader component to display envelope description and remaining amount (balance - max limit) */}
+                  {/* CardHeader component to display envelope description and remaining amount (balance / max limit)*100 */}
                   <CardHeader
                     sx={{
                       backgroundColor: statusColor,
@@ -340,6 +381,7 @@ export const DetailedEnvelope:React.FC = () =>{
                               ${envelope.balance}
                             </Typography>
                           </ListItem>
+                            
                         </Stack>
                       </>
                     }
@@ -365,20 +407,9 @@ export const DetailedEnvelope:React.FC = () =>{
                           ${envelope.maxLimit}
                         </Typography>
                       </Grid2>
+                      {/* Remaining amount is calculated by dividing balance by limit, and taking as percentage */}
                       <Grid2 size={12}>
-                        <Divider />
-                      </Grid2>
-                      <Grid2 size={6}>
-                        <Typography variant="h5">Remaining</Typography>
-                      </Grid2>
-                      <Grid2 size={6}>
-                        <Typography variant="h5">
-                          {remaining > 0 ? (
-                            <>${remaining}</>
-                          ) : (
-                            <>-${Math.abs(remaining)}</>
-                          )}
-                        </Typography>
+                        <LinearProgress color="success" sx={{height:8}} variant="determinate" value={remaining}></LinearProgress>
                       </Grid2>
                     </Grid2>
                   </CardContent>
@@ -398,6 +429,12 @@ export const DetailedEnvelope:React.FC = () =>{
                           <Typography variant="h5" sx={{ fontWeight: "bold" }}>
                             Transactions
                           </Typography>
+
+
+                          {/* Filter and Options buttons */}
+                          <Button id="categoryButton" size="small"onClick={()=>{setFilterMenu(true)}}>Filter{filteredCategory === "All" ? "" : `: ${filteredCategory}`}</Button>
+        
+                          {envelope.user !=null ?
                           <Button
                             onClick={() => {
                               setTransactionMenu(true);
@@ -405,8 +442,12 @@ export const DetailedEnvelope:React.FC = () =>{
                             id="newButton"
                             variant="contained"
                           >
-                            New
+                            Options
                           </Button>
+                          : <></>}
+
+
+                          {/* Menu for creating transactions */}
                           <Menu
                             open={transactionMenu}
                             onClose={() => {
@@ -427,16 +468,85 @@ export const DetailedEnvelope:React.FC = () =>{
                                 navigate("/add");
                               }}
                             >
-                              Add
+                              <Add/>Add Money
                             </MenuItem>
                             <MenuItem
                               onClick={() => {
-                                setOpenCreate(true);
+                                handleCreateOpen();
                                 setTransactionMenu(false);
                               }}
                             >
-                              Spend
+                              <AttachMoney/>Spend Money
                             </MenuItem>
+                            <MenuItem sx={{ color: "red" }}
+                              onClick={() => {
+                                setDeleteDialog(true);
+                              }}
+                            >
+                              <Delete/>Delete Envelope
+                            </MenuItem>
+                          </Menu>
+
+                          {/* Dialog for deleting envelope */}
+                          <Dialog open={deleteDialog} onClose={() => {setDeleteDialog(false);}}>
+                            <DialogTitle>Delete Envelope</DialogTitle>
+                            <DialogContent>
+                              <DialogContentText>
+                                Are you sure you want to delete this envelope?
+                              </DialogContentText>
+                            </DialogContent>
+                            <DialogActions>
+                              <Button
+                                onClick={() => {
+                                  deleteEnvelope();
+                                }}
+                                
+                              >
+                                Yes
+                              </Button>
+                              <Button
+                                onClick={() => {
+                                  setDeleteDialog(false);
+                                }}
+                              >
+                                No
+                              </Button>
+                            </DialogActions>
+                          </Dialog>
+
+                          {/* Menu for filtering transactions */}
+                           <Menu
+                            open={filterMenu}
+                            onClose={() => {
+                              setFilterMenu(false);
+                            }}
+                            anchorEl={document.getElementById("categoryButton")}
+                            anchorOrigin={{
+                              vertical: "bottom",
+                              horizontal: "right",
+                            }}
+                            sx ={{overflowY: "auto"}}
+                          >
+                            
+                            <MenuItem sx={{ fontWeight: "bold" }}
+                              onClick={() => {
+                                setFilteredCategory("All");
+                                setFilterMenu(false);
+                              }}>All</MenuItem>
+                              <MenuItem sx={{ fontWeight: "bold" }} disabled
+                              >Category</MenuItem>
+                            {allCategories.map((category) => {
+                              return (
+                                <MenuItem 
+                                  onClick={() => {
+                                    setFilteredCategory(category);
+                                    setFilterMenu(false);
+                                  }}
+                                >
+                                  {category}
+                                </MenuItem>
+                              );
+                            })}
                           </Menu>
                         </Stack>
                       </>
@@ -451,6 +561,7 @@ export const DetailedEnvelope:React.FC = () =>{
                       </Typography>
                     ) : (
                       transactions
+                        .filter((transaction) => transaction.category === filteredCategory || filteredCategory === "All")
                         .sort(
                           (a, b) => b.datetime.getTime() - a.datetime.getTime()
                         )
@@ -552,7 +663,8 @@ export const DetailedEnvelope:React.FC = () =>{
                   </CardContent>
                 </Card>
               </Grid2>
-
+              
+              {/* Grid2 element with card inside to display balance history graph */}
               <Grid2 size={{ xs: 12, md: 5 }}>
                 <Card variant="outlined" sx={{ boxShadow: 3 }}>
                   <CardHeader
@@ -622,10 +734,12 @@ export const DetailedEnvelope:React.FC = () =>{
                     label="Amount"
                     type="number"
                     slotProps={{
-                            input: {
-                              startAdornment:<InputAdornment position="start">$</InputAdornment>,
-                            },
-                          }}
+                      input: {
+                        startAdornment: (
+                          <InputAdornment position="start">$</InputAdornment>
+                        ),
+                      },
+                    }}
                     helperText={
                       createAmountError
                         ? "Amount exceeds envelope balance."
@@ -638,6 +752,7 @@ export const DetailedEnvelope:React.FC = () =>{
                     id="createTransactionCategory"
                     name="category"
                     label="Category"
+                    defaultValue={transactiontoCreate.category}
                     multiline
                     maxRows={5}
                     required
@@ -659,18 +774,12 @@ export const DetailedEnvelope:React.FC = () =>{
                     transactiontoCreate.title === "" ||
                     transactiontoCreate.transactionAmount === 0 ||
                     transactiontoCreate.transactionDescription === "" ||
-                    transactiontoCreate.category === ""
+                    transactiontoCreate.category === "" 
                   }
                   type="submit"
                   onClick={(e) => {
                     createTransaction(e);
-                    setTransactiontoCreate({
-                      title: "",
-                      transactionAmount: 0,
-                      transactionDescription: "",
-                      category: "",
-                    });
-                    setOpenCreate(false);
+                    handleCreateClose();
                   }}
                 >
                   Submit

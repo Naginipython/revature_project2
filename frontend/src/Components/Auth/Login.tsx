@@ -19,7 +19,7 @@ export const Login: React.FC = () => {
 
     try {
       await axios.post(
-        "http://localhost:8080/users", // Adjust to your backend login endpoint
+        "/users", 
         { username, password }, 
         { withCredentials: true } // Important for cookies/JWT
       ).then((res) => {

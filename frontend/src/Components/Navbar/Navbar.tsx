@@ -6,7 +6,6 @@ import Button from "@mui/material/Button";
 import Link from "@mui/material/Link";
 import { useNavigate } from "react-router-dom";
 import useStore from "../../stores";
-import "./Navbar.css";
 
 export const Navbar: React.FC = () => {
   const { user, setUser } = useStore(); // Access global user state and updater function
@@ -36,7 +35,7 @@ export const Navbar: React.FC = () => {
             <>
               <Link 
                 variant="h5" 
-                sx={{ color: "white", textDecorationColor: "white", cursor: "pointer" }} 
+                sx={{ color: "white", textDecorationColor: "white", cursor: "pointer", fontWeight: 600 }} 
                 underline="always"
                 onClick={() => navigate("/envelopes")}
               >
@@ -44,17 +43,17 @@ export const Navbar: React.FC = () => {
               </Link>
               <Link 
                 variant="h5" 
-                sx={{ color: "white", textDecorationColor: "white", cursor: "pointer" }} 
+                sx={{ color: "white", textDecorationColor: "white", cursor: "pointer", fontWeight: 600 }} 
                 underline="always"
 
-                onClick={() => navigate("/envelopes")}
+                onClick={() => navigate("/transactions")}
               >
                 Activity
               </Link>
               {user.role == "ROLE_MANAGER" &&
                 <Link 
                   variant="h5" 
-                  sx={{ color: "white", textDecorationColor: "white", cursor: "pointer" }} 
+                  sx={{ color: "white", textDecorationColor: "white", cursor: "pointer", fontWeight: 600 }} 
                   underline="always"
                   onClick={() => navigate("/users")}
                 >

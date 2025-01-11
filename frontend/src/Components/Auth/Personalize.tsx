@@ -27,7 +27,7 @@ export const Personalize: React.FC = () => {
   const registerUser = async (data: UserData) => {
     try {
       const response = await axios.post(
-        "http://localhost:8080/users/register",
+        "/users/register",
         data,
         { withCredentials: true },
       ); // Replace with your API endpoint
