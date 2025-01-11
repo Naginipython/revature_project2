@@ -164,4 +164,15 @@ public class AuthentificationServiceTests {
         Assertions.assertTrue(returnObj.isEmpty());
     }
 
+    @Test
+    public void test_validateCurrentUserRole(){
+
+        User user = new User("User","passwordEncoded", "user@user.com","user_fn","user_ln","ROLE_EMPLOYEE");
+        when(passwordEncoder.encode("passwordEncoded")).thenReturn("password");
+        UserDetails userDetails = new CustomUserDetails(user, passwordEncoder);
+
+        Authentication authentication = new JWTAuthObj("anonymousUser", true, userDetails.getAuthorities() );
+
+    }
+
 }

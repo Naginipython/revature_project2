@@ -69,6 +69,8 @@ public class TransactionService {
         if (newCategory == null || newCategory.isEmpty()) {
             throw new BusinessException(607,"Transaction category cannot be null or empty");
         }
+
+
         transaction.setCategory(newCategory);
         return transactionRepository.save(transaction);
     }
@@ -82,5 +84,7 @@ public class TransactionService {
             return ResponseEntity.ok(transactions);
         }
     }
+
+    
 
 }
