@@ -129,7 +129,7 @@ export default function () {
                         variant="contained"
                         color="secondary"
                         sx={{ marginRight: "1rem" }}
-                        onClick={() =>
+                        onClick={() => 
                             {
                             setSelectedUser(user);
                             setPromoteDialog(true)}}
