@@ -26,7 +26,7 @@ public class User {
     private String lastName;
     @Column(nullable = false)
     private String role; // default value provided in UserManagemenetService
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Envelope> envelopes;
 

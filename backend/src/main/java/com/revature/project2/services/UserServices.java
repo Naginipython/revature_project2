@@ -48,6 +48,8 @@ public class UserServices {
     public void deleteByUsername(String username){
         var user = userRepository.findByUsername(username);
         if(user.isEmpty()) throw new UsernameNotFoundException("User Not Found");
+        user.get().getEnvelopes().forEach(envelope -> envelope.setUser(null));
+        user.get().setEnvelopes(List.of());
         userRepository.delete(user.get());
     }
 
