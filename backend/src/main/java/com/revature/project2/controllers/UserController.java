@@ -54,6 +54,12 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @PatchMapping("/role")
+    public ResponseEntity<Void> updateRole(@RequestBody User user){
+        userServices.update(user);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping
     public ResponseEntity<List<OutgoingUserDTO>> getAllUsers() {
         return ResponseEntity.ok(userServices.getAllUsers());

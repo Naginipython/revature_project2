@@ -219,7 +219,7 @@ export const AllTransactions: React.FC = () => {
           margin: "auto",
           maxWidth: { xs: "90%", md: "75%" },
           height: "100%",
-          overflow: "auto"
+          overflow: "auto",
         }}
         id="transacationContainer"
       >
@@ -233,7 +233,12 @@ export const AllTransactions: React.FC = () => {
                     sx={{ justifyContent: "space-between" }}
                   >
                     <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-                     {user.role==="ROLE_MANAGER"?"All Transactions":"Transactions for " + user.firstName + " " + user.lastName} 
+                      {user.role === "ROLE_MANAGER"
+                        ? "All Transactions"
+                        : "Transactions for " +
+                          user.firstName +
+                          " " +
+                          user.lastName}
                     </Typography>
 
                     {/* Filter and Options buttons */}
@@ -244,7 +249,10 @@ export const AllTransactions: React.FC = () => {
                         setFilterMenu(true);
                       }}
                     >
-                      Filter{filteredCategory === "All" ? "" : `: ${filteredCategory}`}
+                      Filter
+                      {filteredCategory === "All"
+                        ? ""
+                        : `: ${filteredCategory}`}
                     </Button>
                   </Stack>
                 </>
@@ -320,11 +328,19 @@ export const AllTransactions: React.FC = () => {
                                   }}
                                 >
                                   -$
-                                  {Math.abs(transaction.transactionAmount)} 
+                                  {Math.abs(transaction.transactionAmount)}
                                 </Typography>
                               )}
-                              <Typography>{transaction.envelope.envelopeDescription} 
-                                {user.role==="ROLE_MANAGER" && user.userId != transaction.envelope.user.userId ?" (" + transaction.envelope.user.firstName + " " + transaction.envelope.user.lastName+")":""}
+                              <Typography>
+                                {transaction.envelope.envelopeDescription}
+                                {user.role === "ROLE_MANAGER" &&
+                                user.userId != transaction.envelope.user.userId
+                                  ? " (" +
+                                    transaction.envelope.user.firstName +
+                                    " " +
+                                    transaction.envelope.user.lastName +
+                                    ")"
+                                  : ""}
                               </Typography>
                             </Stack>
                           </ListItem>
@@ -356,13 +372,15 @@ export const AllTransactions: React.FC = () => {
                           >
                             Edit
                           </Button>
-                        <Button
+                          <Button
                             variant="contained"
-                            onClick={()=>{
-                                navigate(`/envelope/${transaction.envelope.envelopeId}`)
+                            onClick={() => {
+                              navigate(
+                                `/envelope/${transaction.envelope.envelopeId}`
+                              );
                             }}
                           >
-                           Envelope
+                            Envelope
                           </Button>
                         </Stack>
                       </AccordionDetails>
@@ -447,6 +465,7 @@ export const AllTransactions: React.FC = () => {
             setShowAlert(false);
           }}
           message={alertMessage}
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
           action={
             <>
               <IconButton

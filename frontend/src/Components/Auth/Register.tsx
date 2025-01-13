@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Typography, TextField, Button, Divider } from "@mui/material";
+import { Box, Typography, TextField, Button, Divider, Snackbar, Alert } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import "./Register.scss";
 
@@ -16,12 +16,19 @@ export const Register: React.FC = () => {
     confirmPassword: "",
   });
   const navigate = useNavigate();
+  const [errorAlert, setErrorAlert] = useState({ open: false, message: "" });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Pass the user data to Personalize component
-    if (userData.password !== userData.confirmPassword) {
-      alert("Passwords do not match!");
+    if (userData.username === "" || userData.password === "" || userData.confirmPassword === "") {
+      setErrorAlert({open: true, message: "Please fill out all fields!"});
+    }
+    else if (userData.password.length < 8) {
+      setErrorAlert({open: true, message: "Password must be at least 8 characters!"});
+    }
+    else if (userData.password !== userData.confirmPassword) {
+      setErrorAlert({open: true, message: "Passwords do not match!"});
     }else{
       navigate("/personalize", { state: { userData } });
     }
@@ -110,6 +117,18 @@ export const Register: React.FC = () => {
           </Typography>
         </Box>
       </Box>
+
+      {/* Error Snackbar */}
+            <Snackbar
+                    open={errorAlert.open}
+                    autoHideDuration={3000}
+                    onClose={()=>setErrorAlert({open: false, message: ""})}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                  >
+                    <Alert onClose={()=>setErrorAlert({open:false,message:""})} severity="error" sx={{ width: '100%' }}>
+                      {errorAlert.message}
+                    </Alert>
+            </Snackbar>
     </Box>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Typography, TextField, Button, Divider } from "@mui/material";
+import { Box, Typography, TextField, Button, Divider, FormControlLabel, Switch, Snackbar, Alert } from "@mui/material";
 import { Link, useLocation, useNavigate } from "react-router-dom"; // To access passed props
 import "./Personalize.scss";
 import axios from "axios";
@@ -12,6 +12,7 @@ interface UserData {
   firstName: string;
   lastName: string;
   email: string;
+  role: string;
 }
 
 export const Personalize: React.FC = () => {
@@ -21,9 +22,12 @@ export const Personalize: React.FC = () => {
     firstName: "",
     lastName: "",
     email: "",
+    role: "ROLE_EMPLOYEE",
   });
   const navigate = useNavigate();
   const setSnackbar = useStore((state) => state.setSnackbar);
+  const [errorAlert, setErrorAlert] = useState({ open: false, message: "" });
+  const [manager, setManager] = useState(false);
 
   const registerUser = async (data: UserData) => {
     try {
@@ -40,11 +44,19 @@ export const Personalize: React.FC = () => {
     } catch (error) {
       console.error("Error during registration:", error);
       // Handle error (e.g., show error message)
+      setErrorAlert({ open: true, message: "Error during registration!" });
     }
   };
 
   const handlePersonalizeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate the data
+    if (userData.firstName === "" || userData.lastName === "" || userData.email === "") {
+      setErrorAlert({ open: true, message: "Please fill out all fields!" });
+      return;
+    }
+
     // Combine data from both steps (Register and Personalize)
     const completeData = {
       username: userData.username,
@@ -52,6 +64,7 @@ export const Personalize: React.FC = () => {
       firstName: userData.firstName,
       lastName: userData.lastName,
       email: userData.email,
+      role: userData.role,
     };
     // Call API to submit the complete registration data
     await registerUser(completeData);
@@ -60,8 +73,14 @@ export const Personalize: React.FC = () => {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setUserData((prev: UserData) => ({ ...prev, [name]: value }));
+    if (e.target.name === "manager") {
+      setManager(e.target.checked);
+      setUserData((prev: UserData) => ({ ...prev, role: e.target.checked ? "ROLE_MANAGER" : "ROLE_EMPLOYEE" }));
+    }
+    else{
+      const { name, value } = e.target;
+      setUserData((prev: UserData) => ({ ...prev, [name]: value }));
+    }
   };
 
   return (
@@ -121,6 +140,13 @@ export const Personalize: React.FC = () => {
             value={userData.email}
             onChange={handleChange}
           />
+          
+          <FormControlLabel sx={{marginTop: 2, display: "block"}}
+          control={
+            <Switch checked={manager} onChange={handleChange} name="manager" />
+          }
+          label="Make Manager"
+        />
           <Button
             className="button3"
             type="submit"
@@ -141,6 +167,18 @@ export const Personalize: React.FC = () => {
           </Typography>
         </Box>
       </Box>
+          
+                {/* Error Snackbar */}
+                      <Snackbar
+                              open={errorAlert.open}
+                              autoHideDuration={3000}
+                              onClose={()=>setErrorAlert({open: false, message: ""})}
+                              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                            >
+                              <Alert onClose={()=>setErrorAlert({open:false,message:""})} severity="error" sx={{ width: '100%' }}>
+                                {errorAlert.message}
+                              </Alert>
+                      </Snackbar>
     </Box>
   );
 };

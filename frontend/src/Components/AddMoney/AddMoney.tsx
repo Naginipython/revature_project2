@@ -19,6 +19,7 @@ export const AddMoney: React.FC = () => {
     const [error, setError] = useState("");
 
     const user: UserInfo = useStore((state: any) => state.user);
+    const setSnackbar = useStore((state) => state.setSnackbar);
 
     const navigate = useNavigate();
 
@@ -49,6 +50,7 @@ export const AddMoney: React.FC = () => {
             });
 
             await Promise.all(fetchPromises);
+            setSnackbar(true, "Money added successfully!");
             navigate("/envelopes");
         }
     };

@@ -22,9 +22,15 @@
 	}
 
 	&-header {
-		border-radius: 2px;
+		border-radius: 5px 5px 0px 0px;
 		min-width: 275px;
-		height: 15px;
+		height: 15px;;
+
+		&-envpage {
+			position: absolute;
+			top: 0px;
+			right: 0.75px;
+		}
 
 		&-good {
 			@extend .envelope-header;

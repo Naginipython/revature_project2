@@ -9,6 +9,7 @@ import useStore from "../../stores";
 
 export const Navbar: React.FC = () => {
   const { user, setUser } = useStore(); // Access global user state and updater function
+  const setSnackbar = useStore((state) => state.setSnackbar);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -21,6 +22,7 @@ export const Navbar: React.FC = () => {
       lastName: "",
       token: "",
     });
+    setSnackbar(true, "Logout successful!");
     navigate("/");
   };
 
@@ -28,7 +30,7 @@ export const Navbar: React.FC = () => {
     <AppBar position="static" id="appbar">
       <Toolbar>
         <Typography variant="h6" id="navbar-title" sx={{ flexGrow: 1 }}>
-          Project Name
+          Budget App
         </Typography>
         <div className="button-container">
           {user.loggedIn ? (

@@ -35,15 +35,9 @@ export const EnvelopeListCard: React.FC<IProps> = ({ colorClass, envelope, onAmo
         <Typography variant="h1" component="div" sx={{ fontSize: 25 }}>
           {"$" + envelope.balance + "/$" + envelope.max_limit}
         </Typography>
-        {envelope.user_id != user.userId ? (
-          <Typography variant="h1" component="div" sx={{ fontSize: 25 }}>
-            {"Created by user ID " + envelope.user_id}
-          </Typography>
-        ) : (
-          <Typography variant="h1" component="div" sx={{ fontSize: 25 }}>
-            Created by Me
-          </Typography>
-        )}
+        <Typography variant="h1" component="div" sx={{ fontSize: 25 }}>
+            {envelope.user_id != user.userId ? `(User ID ${envelope.user_id})`:""}
+        </Typography>
       </CardContent>
       <Box display="flex" justifyContent="center" alignItems="center">
         <TextField

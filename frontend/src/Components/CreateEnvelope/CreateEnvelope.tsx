@@ -12,7 +12,7 @@ export const CreateEnvelope: React.FC = () => {
     const [limit, setLimit] = useState("");
     const [error, setError] = useState("");
     const [btnDisabled, setBtnDisabled] = useState(true);
-
+    const setSnackbar = useStore((state) => state.setSnackbar);
     const user: UserInfo = useStore((state: any) => state.user);
     const navigate = useNavigate();
 
@@ -26,6 +26,11 @@ export const CreateEnvelope: React.FC = () => {
             setError("Balance and limit must be valid positive numbers.");
             setBtnDisabled(true);
             return;
+        }
+        if (parsedBalance > parsedLimit) {
+            setError("Initial balance must be less than or equal to the limit.");
+            setBtnDisabled(true);
+            return
         }
         if (name == "") {
             setError("Name must not be empty.");
@@ -58,6 +63,7 @@ export const CreateEnvelope: React.FC = () => {
         }).then(body => {
             // TODO: handle failure
             console.log(body);
+            setSnackbar(true, "Envelope created successfully!");
             navigate("/envelopes");
         })
     };

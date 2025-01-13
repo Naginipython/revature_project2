@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Typography, TextField, Button, Divider } from "@mui/material";
+import { Box, Typography, TextField, Button, Divider, Snackbar, Alert } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Login.scss";
@@ -14,6 +14,7 @@ export const Login: React.FC = () => {
 
 	const setUser = useStore((state) => state.setUser);
   const setSnackbar = useStore((state) => state.setSnackbar);
+  const [errorAlert, setErrorAlert] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,6 +50,7 @@ export const Login: React.FC = () => {
       });
 
     } catch (err) {
+      setErrorAlert(true);
       console.error("Login failed:", err);
     }
   };
@@ -123,6 +125,18 @@ export const Login: React.FC = () => {
           </Typography>
         </Box>
       </Box>
+
+      {/* Error Snackbar */}
+      <Snackbar
+              open={errorAlert}
+              autoHideDuration={3000}
+              onClose={()=>setErrorAlert(false)}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            >
+              <Alert onClose={()=>setErrorAlert(false)} severity="error" sx={{ width: '100%' }}>
+                User not found. Check credentials.
+              </Alert>
+      </Snackbar>
     </Box>
   );
 };
